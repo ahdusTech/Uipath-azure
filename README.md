@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # UiPathAzureDevOpsExample
 Implementing  CI CD Pipeline for UiPath
 
@@ -15,3 +16,7 @@ A typical pipeline for UiPath can be –
 5. It can be further improved to Run test cases from Orchestrator.
 
 And many other stages as per your organisation need.
+=======
+# Uipath-azure
+Uipath-azure
+>>>>>>> main
