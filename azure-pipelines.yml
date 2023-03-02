@@ -15,4 +15,14 @@ stages:
         projectJsonPath: '$(Build.SourcesDirectory)\project.json'
         orchestratorConnection: 'Azure-UIpath'
         outputPath: '$(Build.ArtifactStagingDirectory)\Output'
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        ArtifactName: 'drop'
+        publishLocation: 'Container'
+    - task: UiPathTest@3
+      inputs:
+        testTarget: 'TestProject'
+        orchestratorConnection: 'Azure-UIpath'
+        folderName: 'Shared'
 
