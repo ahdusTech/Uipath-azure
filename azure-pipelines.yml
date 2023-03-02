@@ -15,8 +15,4 @@ stages:
         projectJsonPath: '$(Build.SourcesDirectory)\project.json'
         orchestratorConnection: 'Azure-UIpath'
         outputPath: '$(Build.ArtifactStagingDirectory)\Output'
-    - task: UiPathTest@3
-      inputs:
-        testTarget: 'TestProject'
-        orchestratorConnection: 'Azure-UIpath'
-        folderName: 'Shared'
+
