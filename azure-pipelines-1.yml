@@ -8,7 +8,7 @@ stages:
     - job: BuildPackage
       pool: Azure-UIP
       cancelTimeoutInMinutes: 
-  - task: UiPathPack@3
+- task: UiPathPack@3
     inputs:
       versionType: 'AutoVersion'
       projectJsonPath: '$(Build.SourcesDirectory)\project.json'
