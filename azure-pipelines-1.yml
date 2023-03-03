@@ -65,8 +65,8 @@ stages:
         cliProjectKey: 'rpabotsworld_UiPathAzureDevOpsExample'
         cliProjectName: 'UiPathAzureDevOpsExample'
         cliSources: '.'
-    - task: SonarCloudAnalyze@1
-    - task: SonarCloudPublish@1
+    - task: SonarCloudAnalyze@3
+    - task: SonarCloudPublish@3
       inputs:
         pollingTimeoutSec: '300'
 
