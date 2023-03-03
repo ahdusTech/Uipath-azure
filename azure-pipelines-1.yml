@@ -1,16 +1,32 @@
 trigger:
-  - main
+- main
 
 stages:
-  - stage: Build
-    displayName: Build Package
-    jobs:
-    - job: BuildPackage
-      pool: Azure-UIP
-      cancelTimeoutInMinutes: 
-- task: UiPathPack@3
-    inputs:
-      versionType: 'AutoVersion'
-      projectJsonPath: '$(Build.SourcesDirectory)\project.json'
-      orchestratorConnection: 'Azure-UIpath'
-      outputPath: '$(Build.ArtifactStagingDirectory)\Output'
+- stage: Build
+  displayName: Build Package
+  jobs:
+  - job: BuildPackage
+    pool:
+      name: Azure-UIP
+    timeoutInMinutes: 60
+    steps:
+    - task: UiPathPack@3
+      inputs:
+        versionType: 'AutoVersion'
+        projectJsonPath: '$(Build.SourcesDirectory)/project.json'
+        orchestratorConnection: 'Azure-UIpath'
+        outputPath: '$(Build.ArtifactStagingDirectory)/Output'
+
+- stage: Asset
+  displayName: Create Assets
+  jobs:
+  - job: CreateAssets
+    pool:
+      name: Azure-UIP
+    steps:
+    - task: UiPathAssets@2
+      inputs:
+        orchestratorConnection: 'Azure-UIpath'
+        folderName: 'Shared'
+        assetActionType: 'Deploy'
+        csvFile: '$(Build.SourcesDirectory)/Data/Assets.csv'
