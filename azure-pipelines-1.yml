@@ -8,7 +8,6 @@ stages:
     - job: BuildPackage
       pool: LAPTOP-Q338O4FK
       cancelTimeoutInMinutes: 
-  
       steps:
       - task: UiPathPack@2
         inputs:
