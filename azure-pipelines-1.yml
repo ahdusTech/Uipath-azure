@@ -36,7 +36,7 @@ stages:
     jobs:
       - deployment: deployDEV
         displayName: Deploy package to DEV Orchestrator
-        pool: LAPTOP-Q338O4FK
+        pool: Azure-UIP
         environment: DEV
         strategy:
          runOnce:
