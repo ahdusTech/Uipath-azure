@@ -1,11 +1,15 @@
 trigger:
-  - master
+  branches:
+    include:
+      - main
+
 stages:
   - stage: Build
     displayName: Build Package
     jobs:
     - job: BuildPackage
-      pool: LAPTOP-Q338O4FK
+      pool:
+        vmImage: 'windows-latest'
       steps:
       - task: UiPathPack@2
         inputs:
@@ -17,11 +21,12 @@ stages:
       - publish: $(Build.ArtifactStagingDirectory)
         artifact: drop
 
-  - stage: Assest
+  - stage: Assests
     displayName: Create Assests
     jobs:
       - job: CreateAssests
-        pool: LAPTOP-Q338O4FK
+        pool:
+          vmImage: 'windows-latest'
         steps:
         - task: UiPathAssets@2
           inputs:
@@ -37,7 +42,8 @@ stages:
     jobs:
       - deployment: deployDEV
         displayName: Deploy package to DEV Orchestrator
-        pool: LAPTOP-Q338O4FK
+        pool:
+          vmImage: 'windows-latest'
         environment: DEV
         strategy:
          runOnce:
@@ -55,6 +61,8 @@ stages:
     condition: succeeded()
     jobs:
       - job : CodeQuality
+        pool:
+          vmImage: 'windows-latest'
         steps:
           - task: SonarCloudPrepare@1
             inputs:
@@ -70,14 +78,14 @@ stages:
             inputs:
               pollingTimeoutSec: '300'
 
-
   - stage: TestDEV
-    displayName:  Test After Publish
+    displayName: Test After Publish
     dependsOn: DeployDEV
     condition: succeeded()
     jobs:
       - job: TestDEV
-        pool: LAPTOP-Q338O4FK
+        pool:
+          vmImage: 'windows-latest'
         steps:
           - task: UiPathTest@2
             inputs:
@@ -85,4 +93,3 @@ stages:
               orchestratorConnection: 'UiPATH RPABOTSWORLD'
               testSet: 'UiPathAzureDevOps_Tests'
               folderName: 'Shared'
-              testReportDestination: '$(Pipeline.Workspace)\drop\'
