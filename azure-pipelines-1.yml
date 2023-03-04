@@ -41,7 +41,6 @@ stages:
     environment: 
       name: 'dev'
       resourceType: 'VirtualMachine'
-      resourceId: '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}'
     strategy:
       runOnce:
         deploy:
