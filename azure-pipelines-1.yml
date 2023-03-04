@@ -41,6 +41,7 @@ stages:
     environment: 
       name: 'dev'
       resourceType: 'VirtualMachine'
+      resourceId: '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}'
     strategy:
       runOnce:
         deploy:
@@ -50,6 +51,8 @@ stages:
               orchestratorConnection: 'Azure-UIpath'
               packagesPath: '$(Pipeline.Workspace)/drop/'
               folderName: 'Shared'
+
+     
 
 - stage: CodeQuality
   displayName: Check Code Analysis
