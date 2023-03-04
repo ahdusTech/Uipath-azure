@@ -39,8 +39,8 @@ stages:
     displayName: Deploy package to DEV Orchestrator
     pool: Azure-UIP
     environment: 
-      name: 'dev'
-      resourceType: 'VirtualMachine'
+      name: 'DEV'
+      resourceType: 'Standard'
     strategy:
       runOnce:
         deploy:
