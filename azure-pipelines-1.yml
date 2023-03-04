@@ -55,6 +55,8 @@ stages:
   condition: succeeded()
   jobs:
   - job: CodeQuality
+    pool: Azure-UIP
+
 - stage: TestDEV
   displayName: Test After Publish
   dependsOn: DeployDEV
