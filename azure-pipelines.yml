@@ -25,9 +25,3 @@ stages:
         testTarget: 'TestProject'
         orchestratorConnection: 'Azure-UIpath'
         folderName: 'Shared'
-    - task: UiPathDeploy@3
-      inputs:
-        packagePath: '$(Build.ArtifactStagingDirectory)\Output'
-        orchestratorConnection: 'Azure-UIpath'
-        environmentName: 'Production'
-        sleepBeforeStart: '30'
