@@ -64,7 +64,7 @@ stages:
     - task: UiPathTest@3
       inputs:
         testTarget: 'TestSet'
-        orchestratorConnection: 'UiPATH RPABOTSWORLD'
+        orchestratorConnection: 'Azure-UIpath'
         testSet: 'UiPathAzureDevOps_Tests'
         folderName: 'Shared'
         testReportDestination: '$(Pipeline.Workspace)\drop\'
