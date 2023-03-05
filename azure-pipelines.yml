@@ -20,8 +20,9 @@ stages:
         PathtoPublish: '$(Build.ArtifactStagingDirectory)'
         ArtifactName: 'drop'
         publishLocation: 'Container'
-    - task: UiPathTest@3
+    
+    - task: UiPathDeploy@3
       inputs:
-        testTarget: 'TestProject'
         orchestratorConnection: 'Azure-UIpath'
+        packagesPath: '$(Build.ArtifactStagingDirectory)\Output'
         folderName: 'Shared'
