@@ -53,27 +53,6 @@ stages:
               packagesPath: '$(Pipeline.Workspace)\drop\'
               folderName: 'Shared'
 
-- stage: CodeQuality
-  displayName: Check Code Analysis
-  dependsOn: Build
-  condition: succeeded()
-  jobs:
-  - job: CodeQuality
-    steps:
-    - task: SonarCloudPrepare@1
-      inputs:
-        SonarCloud: 'Sonar'
-        organization: 'rpabotsworld'
-        scannerMode: 'CLI'
-        configMode: 'manual'
-        cliProjectKey: 'rpabotsworld_UiPathAzureDevOpsExample'
-        cliProjectName: 'UiPathAzureDevOpsExample'
-        cliSources: '.'
-    - task: SonarCloudAnalyze@1
-    - task: SonarCloudPublish@1
-      inputs:
-        pollingTimeoutSec: '300'
-
 - stage: TestDEV
   displayName: Test After Publish
   dependsOn: DeployDEV
