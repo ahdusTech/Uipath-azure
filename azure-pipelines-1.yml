@@ -22,9 +22,9 @@ stages:
       artifact: drop
 
 - stage: Assest
-  displayName: Create Assets
+  displayName: Create Assests
   jobs:
-  - job: CreateAssets
+  - job: CreateAssests
     pool: Azure-UIP
     steps:
     - task: UiPathAssets@3
