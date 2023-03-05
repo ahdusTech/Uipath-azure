@@ -50,7 +50,7 @@ stages:
           - task: UiPathDeploy@3
             inputs:
               orchestratorConnection: 'Azure-UIpath'
-              packagesPath: '$(Build.ArtifactStagingDirectory)\Output'
+              packagesPath: '$(Build.ArtifactStagingDirectory)'
               folderName: 'Shared'
 
 - stage: TestDEV
@@ -67,4 +67,4 @@ stages:
         orchestratorConnection: 'Azure-UIpath'
         testSet: 'UiPathAzureDevOps_Tests'
         folderName: 'Shared'
-        testReportDestination: '$(Pipeline.Workspace)\drop\'
+        testReportDestination: '$(Build.ArtifactStagingDirectory)'
