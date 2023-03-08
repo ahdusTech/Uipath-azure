@@ -21,7 +21,6 @@ stages:
           - publish: $(Build.ArtifactStagingDirectory)
             artifact: drop
 
-
   - stage: Assest
     displayName: Create Assets
     jobs:
@@ -48,11 +47,16 @@ stages:
           runOnce:
             deploy:
               steps:
-                - task: UiPathDeploy@3
+                - task: UseDotNet@2
                   inputs:
-                    orchestratorConnection: 'Azure-UIpath'
-                    packagesPath: '$(Pipeline.Workspace)/drop/'
-                    folderName: 'Shared'
+                    packageType: 'sdk'
+                    useGlobalJson: true
+                - task: NuGetCommand@2
+                  inputs:
+                    command: 'restore'
+                    restoreSolution: '**/*.sln'
+                    feedsToUse: 'select'
+                    vstsFeed: 'c308d515-72d0-4d86-be1f-25386bead831'
 
   - stage: TestDEV
     displayName: Test After Publish
@@ -69,4 +73,3 @@ stages:
               testSet: 'UiPathAzureDevOps_Tests'
               folderName: 'Shared'
               testReportDestination: '$(Pipeline.Workspace)/drop/'
-
