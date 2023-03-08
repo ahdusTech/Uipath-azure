@@ -51,7 +51,7 @@ stages:
                 - task: UiPathDeploy@3
                   inputs:
                     orchestratorConnection: 'Azure-UIpath'
-                    packagesPath: '$(Pipeline.Workspace)/output/'
+                    packagesPath: '$(Pipeline.Workspace)/drop/'
                     folderName: 'Shared'
 
   - stage: TestDEV
