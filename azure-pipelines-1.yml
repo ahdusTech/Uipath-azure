@@ -14,45 +14,20 @@ stages:
     steps:
     - task: UiPathPack@3
       inputs:
-        versionType: AutoVersion
+        versionType: 'AutoVersion'
         projectJsonPath: '$(Build.SourcesDirectory)/project.json'
-        outputType: Process
         orchestratorConnection: 'Azure-UIpath'
-        outputPath: '$(Build.ArtifactStagingDirectory)'
-    - publish: 
-        artifact: drop
-        path: '$(Build.ArtifactStagingDirectory)'
+        outputPath: '$(Build.ArtifactStagingDirectory)\Output'
 
-- stage: Assets
-  displayName: 'Create Assets'
-  jobs:
-  - job: CreateAssets
-    pool:
-      name: Azure-UIP
-    steps:
-    - task: UiPathAssets@3
-      inputs:
-        orchestratorConnection: 'Azure-UIpath'
-        folderName: 'Shared'
-        assetActionType: Deploy
-        csvFile: '$(Build.SourcesDirectory)/Data/Assets.csv'
-
-- stage: DeployDEV
-  displayName: 'Deploy Build Artifact to DEV'
-  dependsOn: Build
-  condition: succeeded()
-  jobs:
-  - deployment: DeployDEV
-    displayName: 'Deploy Package to DEV Orchestrator'
-    pool:
-      name: Azure-UIP
-    environment: 'DEV'
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - task: UiPathDeploy@3
-            inputs:
-              orchestratorConnection: 'Azure-UIpath'
-              packagesPath: '$(Pipeline.Workspace)'
-              folderName: 'Shared'
+  - stage: Assest
+    displayName: Create Assests
+    jobs:
+      - job: CreateAssests
+        pool: LAPTOP-Q338O4FK
+        steps:
+        - task: UiPathAssets@2
+          inputs:
+            orchestratorConnection: 'UiPath DEV'
+            folderName: 'Shared'
+            assetActionType: 'Deploy'
+            csvFile: '$(Build.SourcesDirectory)\Data\Assests.csv'
