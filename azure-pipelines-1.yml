@@ -6,43 +6,47 @@ variables:
 
 stages:
 - stage: Build
-  displayName: Build Package
+  displayName: 'Build Package'
   jobs:
   - job: BuildPackage
-    pool: Azure-UIP
+    pool:
+      name: Azure-UIP
     steps:
     - task: UiPathPack@3
       inputs:
-        versionType: 'AutoVersion'
-        projectJsonPath: '$(Build.SourcesDirectory)\project.json'
-        outputType: 'Process'
+        versionType: AutoVersion
+        projectJsonPath: '$(Build.SourcesDirectory)/project.json'
+        outputType: Process
         orchestratorConnection: 'Azure-UIpath'
         outputPath: '$(Build.ArtifactStagingDirectory)'
-    - publish: $(Build.ArtifactStagingDirectory)
-      artifact: drop
+    - publish: 
+        artifact: drop
+        path: '$(Build.ArtifactStagingDirectory)'
 
-- stage: Assest
-  displayName: Create Assests
+- stage: Assets
+  displayName: 'Create Assets'
   jobs:
-  - job: CreateAssests
-    pool: Azure-UIP
+  - job: CreateAssets
+    pool:
+      name: Azure-UIP
     steps:
     - task: UiPathAssets@3
       inputs:
         orchestratorConnection: 'Azure-UIpath'
         folderName: 'Shared'
-        assetActionType: 'Deploy'
-        csvFile: '$(Build.SourcesDirectory)\Data\Assests.csv'
+        assetActionType: Deploy
+        csvFile: '$(Build.SourcesDirectory)/Data/Assets.csv'
 
 - stage: DeployDEV
-  displayName: Deploy build artifact to DEV
+  displayName: 'Deploy Build Artifact to DEV'
   dependsOn: Build
   condition: succeeded()
   jobs:
-  - deployment: deployDEV
-    displayName: Deploy package to DEV Orchestrator
-    pool: Azure-UIP
-    environment: DEV
+  - deployment: DeployDEV
+    displayName: 'Deploy Package to DEV Orchestrator'
+    pool:
+      name: Azure-UIP
+    environment: 'DEV'
     strategy:
       runOnce:
         deploy:
@@ -50,7 +54,5 @@ stages:
           - task: UiPathDeploy@3
             inputs:
               orchestratorConnection: 'Azure-UIpath'
-              packagesPath: '$(Build.ArtifactStagingDirectory)'
+              packagesPath: '$(Pipeline.Workspace)'
               folderName: 'Shared'
-
-
