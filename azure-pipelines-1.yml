@@ -64,7 +64,6 @@ stages:
         steps:
           - task: UiPathTest@3
             inputs:
-              testTarget: 'TestSet'
+              testTarget: 'TestProject'
               orchestratorConnection: 'Azure-UIpath'
-              testSet: 'UiPathAzureDevOps_Tests'
               folderName: 'Shared'
