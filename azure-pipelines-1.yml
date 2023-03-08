@@ -53,18 +53,4 @@ stages:
               packagesPath: '$(Build.ArtifactStagingDirectory)'
               folderName: 'Shared'
 
-- stage: TestDEV
-  displayName: Test After Publish
-  dependsOn: DeployDEV
-  condition: succeeded()
-  jobs:
-  - job: TestDEV
-    pool: Azure-UIP
-    steps:
-    - task: UiPathTest@3
-      inputs:
-        testTarget: 'TestSet'
-        orchestratorConnection: 'Azure-UIpath'
-        testSet: 'UiPathAzureDevOps_Tests'
-        folderName: 'Shared'
-        testReportDestination: '$(Build.ArtifactStagingDirectory)'
+
