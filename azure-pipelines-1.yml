@@ -47,10 +47,6 @@ stages:
           runOnce:
             deploy:
               steps:
-                - task: UseDotNet@2
-                  inputs:
-                    packageType: 'sdk'
-                    useGlobalJson: true
                 - task: NuGetCommand@2
                   inputs:
                     command: 'restore'
