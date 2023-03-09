@@ -1,3 +1,4 @@
+
 trigger:
   - main
 
@@ -9,8 +10,7 @@ stages:
     displayName: Build Package
     jobs:
       - job: BuildPackage
-        pool:
-          name: Azure-UIP
+        pool: Azure-UIP
         steps:
           - task: UiPathPack@3
             inputs:
@@ -19,13 +19,15 @@ stages:
               outputType: 'Process'
               orchestratorConnection: 'Azure-UIpath'
               outputPath: '$(Build.ArtifactStagingDirectory)'
+          - publish: $(Build.ArtifactStagingDirectory)
+            artifact: drop
 
-  - stage: Assets
+
+  - stage: Assest
     displayName: Create Assets
     jobs:
       - job: CreateAssets
-        pool:
-          name: Azure-UIP
+        pool: Azure-UIP
         steps:
           - task: UiPathAssets@3
             inputs:
@@ -39,20 +41,19 @@ stages:
     dependsOn: Build
     condition: succeeded()
     jobs:
-      - deployment: DeployDEV
+      - deployment: deployDEV
         displayName: Deploy package to DEV Orchestrator
-        pool:
-          name: Azure-UIP
+        pool: Azure-UIP
         environment: DEV
         strategy:
           runOnce:
             deploy:
               steps:
-                - task: UiPathTest@3
+                - task: UiPathDeploy@3
                   inputs:
                     orchestratorConnection: 'Azure-UIpath'
+                    packagesPath: '$(Pipeline.Workspace)'
                     folderName: 'Shared'
-                    testReportDestination: '$(Pipeline.Workspace)/drop'
 
   - stage: TestDEV
     displayName: Test After Publish
@@ -60,11 +61,13 @@ stages:
     condition: succeeded()
     jobs:
       - job: TestDEV
-        pool:
-          name: Azure-UIP
+        pool: Azure-UIP
         steps:
           - task: UiPathTest@3
             inputs:
-              testTarget: 'TestProject'
+              testTarget: 'TestSet'
               orchestratorConnection: 'Azure-UIpath'
+              testSet: 'UiPathAzureDevOps_Tests'
               folderName: 'Shared'
+              testReportDestination: '$(Pipeline.Workspace)/drop'
+
