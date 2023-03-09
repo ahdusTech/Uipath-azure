@@ -19,9 +19,6 @@ stages:
               outputType: 'Process'
               orchestratorConnection: 'Azure-UIpath'
               outputPath: '$(Build.ArtifactStagingDirectory)'
-          - publish: 
-              artifact: drop
-              path: $(Build.ArtifactStagingDirectory)
 
   - stage: Assets
     displayName: Create Assets
