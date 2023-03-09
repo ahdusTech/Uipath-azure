@@ -19,9 +19,10 @@ stages:
               outputType: 'Process'
               orchestratorConnection: 'Azure-UIpath'
               outputPath: '$(Build.ArtifactStagingDirectory)'
-          - publish: 
-              artifact: drop
-              path: '$(Build.ArtifactStagingDirectory)'
+          - task: PublishPipelineArtifact@1
+            inputs:
+              targetPath: '$(Pipeline.Workspace)'
+              publishLocation: 'pipeline'
 
   - stage: Assest
     displayName: Create Assets
