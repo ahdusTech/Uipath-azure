@@ -29,53 +29,53 @@ stages:
         orchestratorConnection: 'Azure-UIpath'
         packagesPath: '$(Build.ArtifactStagingDirectory)/Output'
         folderName: 'Shared'
-  - stage: Asset
-    displayName: Create Assets
-    jobs:
-      - job: CreateAssets
-        pool:
-          name: Azure-UIP
-        steps:
-          - task: UiPathAssets@3
-            inputs:
-              orchestratorConnection: 'Azure-UIpath'
-              folderName: 'Shared'
-              assetActionType: 'Deploy'
-              csvFile: '$(Build.SourcesDirectory)/Data/Assests.csv'
+- stage: Asset
+  displayName: Create Assets
+  jobs:
+    - job: CreateAssets
+      pool:
+        name: Azure-UIP
+      steps:
+        - task: UiPathAssets@3
+          inputs:
+            orchestratorConnection: 'Azure-UIpath'
+            folderName: 'Shared'
+            assetActionType: 'Deploy'
+            csvFile: '$(Build.SourcesDirectory)/Data/Assests.csv'
 
-  - stage: DeployDEV
-    displayName: Deploy build artifact to DEV
-    dependsOn: Build
-    condition: succeeded()
-    jobs:
-      - deployment: deployDEV
-        displayName: Restore package to DEV Orchestrator
-        pool:
-          name: Azure-UIP
-        environment: 'DEV'
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-                - task: NuGetCommand@2
-                  inputs:
-                    command: 'restore'
-                    restoreSolution: '**/*.sln'
-                    feedsToUse: 'select'
+- stage: DeployDEV
+  displayName: Deploy build artifact to DEV
+  dependsOn: Build
+  condition: succeeded()
+  jobs:
+    - deployment: deployDEV
+      displayName: Restore package to DEV Orchestrator
+      pool:
+        name: Azure-UIP
+      environment: 'DEV'
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - task: NuGetCommand@2
+                inputs:
+                  command: 'restore'
+                  restoreSolution: '**/*.sln'
+                  feedsToUse: 'select'
 
-  - stage: TestDEV
-    displayName: Test After Publish
-    dependsOn: DeployDEV
-    condition: succeeded()
-    jobs:
-      - job: TestDEV
-        pool:
-          name: Azure-UIP
-        steps:
-          - task: UiPathTest@3
-            inputs:
-              testTarget: 'TestSet'
-              orchestratorConnection: 'Azure-UIpath'
-              testSet: 'UiPathAzureDevOps_Tests'
-              folderName: 'Shared'
-              testReportDestination: '$(Build.ArtifactStagingDirectory)'
+- stage: TestDEV
+  displayName: Test After Publish
+  dependsOn: DeployDEV
+  condition: succeeded()
+  jobs:
+    - job: TestDEV
+      pool:
+        name: Azure-UIP
+      steps:
+        - task: UiPathTest@3
+          inputs:
+            testTarget: 'TestSet'
+            orchestratorConnection: 'Azure-UIpath'
+            testSet: 'UiPathAzureDevOps_Tests'
+            folderName: 'Shared'
+            testReportDestination: '$(Build.ArtifactStagingDirectory)'
