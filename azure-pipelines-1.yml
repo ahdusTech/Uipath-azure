@@ -59,7 +59,7 @@ stages:
                 - task: UiPathDeploy@3
                   inputs:
                     orchestratorConnection: 'Azure-UIpath'
-                    packagesPath: '$(Build.ArtifactStagingDirectory)/Output'
+                    packagesPath: '$(Build.ArtifactStagingDirectory)/project.json'
                     folderName: 'Shared'
 
   - stage: TestDEV
