@@ -29,6 +29,7 @@ stages:
         orchestratorConnection: 'Azure-UIpath'
         packagesPath: '$(Build.ArtifactStagingDirectory)/Output'
         folderName: 'Shared'
+
 - stage: Asset
   displayName: Create Assets
   jobs:
@@ -79,3 +80,21 @@ stages:
             testSet: 'UiPathAzureDevOps_Tests'
             folderName: 'Shared'
             testReportDestination: '$(Build.ArtifactStagingDirectory)'
+
+    - job: TestDEV2
+      pool:
+        name: Azure-UIP
+      steps:
+        - task: UiPathTest@3
+          inputs:
+            testTarget: 'TestSet'
+            orchestratorConnection: 'Azure-UIpath'
+            testSet: 'UiPathAzureDevOps_Tests'
+            folderName: 'Shared'
+            testReportDestination: '$(Build.ArtifactStagingDirectory)'
+        - task: UiPathTestSetExecution@3
+          inputs:
+            orchestratorConnection: 'Azure-UIpath'
+            testSet: 'UiPathAzureDevOps_Tests'
+            folderName: 'Shared'
+            releaseNotes: 'Automated test run'
