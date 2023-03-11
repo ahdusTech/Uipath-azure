@@ -76,6 +76,6 @@ stages:
           inputs:
             testTarget: 'TestSet'
             orchestratorConnection: 'Azure-UIpath'
-            testSet: 'UiPathAzureDevOps_Tests'
+            testSet: 'UiPathAzureTestSet'
             folderName: 'Shared'
             testReportDestination: '$(Build.ArtifactStagingDirectory)'
