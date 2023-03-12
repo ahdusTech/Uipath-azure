@@ -49,5 +49,5 @@ stages:
             - task: UiPathDeploy@3
               inputs:
                 orchestratorConnection: 'Azure-UIpath'
-                packagesPath: '$(Pipeline.Workspace)\drop'
+                packagesPath: '$(Build.ArtifactStagingDirectory)/Output'
                 folderName: 'Shared'
