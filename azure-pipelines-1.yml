@@ -78,4 +78,4 @@ stages:
             orchestratorConnection: 'Azure-UIpath'
             testSet: 'UiPathAzureTestSet'
             folderName: 'Shared'
-            testReportDestination: '$(Build.ArtifactStagingDirectory)'
+            testReportDestination: '$(Build.SourcesDirectory)/project.json'
