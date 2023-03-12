@@ -62,11 +62,6 @@ stages:
                   command: 'restore'
                   restoreSolution: '**/*.sln'
                   feedsToUse: 'select'
-              - task: UiPathDeploy@3
-                inputs:
-                  orchestratorConnection: 'Azure-UIpath'
-                  packagesPath: '$(Build.ArtifactStagingDirectory)/Output'
-                  folderName: 'Shared'
 
 - stage: TestDEV
   displayName: Test After Publish
@@ -79,7 +74,6 @@ stages:
       steps:
         - task: UiPathTest@3
           inputs:
-            testTarget: 'TestSet'
+            testTarget: 'TestProject'
             orchestratorConnection: 'Azure-UIpath'
-            testSet: 'UiPathAzureTestSet'
             folderName: 'Shared'
