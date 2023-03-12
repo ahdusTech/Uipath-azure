@@ -31,4 +31,4 @@ stages:
             orchestratorConnection: 'Azure-UIpath'
             folderName: 'Shared'
             assetActionType: 'Deploy'
-            csvFile: '$(Build.SourcesDirectory)\Data\Assests.csv'
+            csvFile: '$(Build.SourcesDirectory)\Data\Assets.csv'
