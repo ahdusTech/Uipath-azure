@@ -24,11 +24,11 @@ stages:
     displayName: Create Assests
     jobs:
       - job: CreateAssests
-        pool: LAPTOP-Q338O4FK
+        pool: Azure-UIP
         steps:
         - task: UiPathAssets@3
           inputs:
-            orchestratorConnection: 'UiPath DEV'
+            orchestratorConnection: 'Azure-UIpath'
             folderName: 'Shared'
             assetActionType: 'Deploy'
             csvFile: '$(Build.SourcesDirectory)\Data\Assests.csv'
