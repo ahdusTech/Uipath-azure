@@ -1,5 +1,5 @@
 trigger:
-  - master
+  - main
 variables:
   - group: UiPath
 
@@ -16,9 +16,7 @@ stages:
           projectJsonPath: '$(Build.SourcesDirectory)\project.json'
           outputType: 'Process'
           orchestratorConnection: 'Azure-UIpath'
-          outputPath: '$(Build.ArtifactStagingDirectory)'
-      - publish: $(Build.ArtifactStagingDirectory)
-        artifact: drop
+          outputPath: '$(Build.ArtifactStagingDirectory)/Output'
 
   - stage: Assest
     displayName: Create Assests
@@ -46,6 +44,11 @@ stages:
          runOnce:
           deploy:
            steps:
+            - task: PublishBuildArtifacts@1
+              inputs:
+                PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+                ArtifactName: 'drop'
+                publishLocation: 'Container'
             - task: UiPathDeploy@3
               inputs:
                 orchestratorConnection: 'Azure-UIpath'
