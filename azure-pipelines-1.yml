@@ -1,5 +1,6 @@
 trigger:
   - main
+
 variables:
   - group: UiPath
 
@@ -7,29 +8,29 @@ stages:
   - stage: Build
     displayName: Build Package
     jobs:
-    - job: BuildPackage
-      pool:  Azure-UIP
-      steps:
-      - task: UiPathPack@3
-        inputs:
-          versionType: 'AutoVersion'
-          projectJsonPath: '$(Build.SourcesDirectory)\project.json'
-          orchestratorConnection: 'Azure-UIpath'
-          outputPath: '$(Build.ArtifactStagingDirectory)/Output'
-
-  - stage: Assest
-    displayName: Create Assests
-    jobs:
-      - job: CreateAssests
+      - job: BuildPackage
         pool: Azure-UIP
         steps:
-        - task: UiPathAssets@3
-          inputs:
-            orchestratorConnection: 'Azure-UIpath'
-            folderName: 'Shared'
-            assetActionType: 'Deploy'
-            csvFile: '$(Build.SourcesDirectory)\Data\Assets.csv'
-            
+          - task: UiPathPack@3
+            inputs:
+              versionType: 'AutoVersion'
+              projectJsonPath: '$(Build.SourcesDirectory)/project.json'
+              orchestratorConnection: 'Azure-UIpath'
+              outputPath: '$(Build.ArtifactStagingDirectory)/Output'
+
+  - stage: Asset
+    displayName: Create Assets
+    jobs:
+      - job: CreateAssets
+        pool: Azure-UIP
+        steps:
+          - task: UiPathAssets@3
+            inputs:
+              orchestratorConnection: 'Azure-UIpath'
+              folderName: 'Shared'
+              assetActionType: 'Deploy'
+              csvFile: '$(Build.SourcesDirectory)/Data/Assets.csv'
+
   - stage: DeployDEV
     displayName: Deploy build artifact to DEV
     dependsOn: Build
@@ -40,16 +41,16 @@ stages:
         pool: Azure-UIP
         environment: DEV
         strategy:
-         runOnce:
-          deploy:
-           steps:
-            - task: PublishBuildArtifacts@1
-              inputs:
-                PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-                ArtifactName: 'drop'
-                publishLocation: 'Container'
-            - task: UiPathDeploy@3
-              inputs:
-                orchestratorConnection: 'Azure-UIpath'
-                packagesPath: '$(Build.ArtifactStagingDirectory)/Output'
-                folderName: 'Shared'
+          runOnce:
+            deploy:
+              steps:
+                - task: PublishBuildArtifacts@1
+                  inputs:
+                    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+                    ArtifactName: 'drop'
+                    publishLocation: 'Container'
+      - task: UiPathDeploy@3
+        inputs:
+          orchestratorConnection: 'Azure-UIpath'
+          packagesPath: '$(Build.ArtifactStagingDirectory)/Output'
+          folderName: 'Shared'
