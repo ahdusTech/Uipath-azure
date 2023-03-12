@@ -1,4 +1,3 @@
-# This YAML file describes the Azure Pipelines CI/CD pipeline for UiPath projects
 
 trigger:
 - main
@@ -29,11 +28,6 @@ stages:
       inputs:
         orchestratorConnection: 'Azure-UIpath'
         packagesPath: '$(Build.ArtifactStagingDirectory)/Output'
-        folderName: 'Shared'
-    - task: UiPathTest@3
-      inputs:
-        testTarget: 'TestProject'
-        orchestratorConnection: 'Azure-UIpath'
         folderName: 'Shared'
 
 - stage: Asset
@@ -72,7 +66,7 @@ stages:
               - task: UiPathDeploy@3
                 inputs:
                   orchestratorConnection: 'Azure-UIpath'
-                  packagesPath: '$(System.DefaultWorkingDirectory)/drop'
+                  packagesPath: '$(Pipeline.Workspace)\drop'
                   folderName: 'Shared'
 
 - stage: TestDEV
@@ -90,4 +84,4 @@ stages:
             orchestratorConnection: 'Azure-UIpath'
             testSet: 'UiPathAzureTestSet'
             folderName: 'Shared'
-            testReportDestination: '$(Build.SourcesDirectory)'
+            testReportDestination: '$(Pipeline.Workspace)\drop'
