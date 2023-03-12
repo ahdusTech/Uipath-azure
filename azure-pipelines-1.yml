@@ -19,3 +19,16 @@ stages:
           outputPath: '$(Build.ArtifactStagingDirectory)'
       - publish: $(Build.ArtifactStagingDirectory)
         artifact: drop
+
+  - stage: Assest
+    displayName: Create Assests
+    jobs:
+      - job: CreateAssests
+        pool: LAPTOP-Q338O4FK
+        steps:
+        - task: UiPathAssets@3
+          inputs:
+            orchestratorConnection: 'UiPath DEV'
+            folderName: 'Shared'
+            assetActionType: 'Deploy'
+            csvFile: '$(Build.SourcesDirectory)\Data\Assests.csv'
