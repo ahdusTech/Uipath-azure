@@ -63,22 +63,33 @@ stages:
                   restoreSolution: '**/*.sln'
                   feedsToUse: 'select'
 
-- stage: TestDEV
-  displayName: Test After Publish
-  dependsOn: DeployDEV
-  condition: succeeded()
+- stage: RunTests
+  displayName: Run UiPath Tests
   jobs:
-    - job: TestDEV
-      pool:
-        name: Azure-UIP
-      steps:
-        - task: VSTest@2
-          inputs:
-            platform: 'Any CPU'
-            configuration: 'release'
-            testSelector: 'testAssemblies'
-            testAssemblyVer2: |
-              **\*test*.dll
-              !**\*TestAdapter.dll
-              !**\obj\**
-            searchFolder: '$(Build.SourcesDirectory)'
+  - job: RunUiPathTests
+    displayName: Run UiPath Tests
+    pool:
+      vmImage: 'windows-2019' # Specify a Windows image with UiPath and other required tools installed.
+    steps:
+    - task: NuGetToolInstaller@1
+      displayName: 'Install NuGet'
+      inputs:
+        versionSpec: '5.x'
+    - task: NuGetCommand@2
+      displayName: 'Restore NuGet packages'
+      inputs:
+        command: 'restore'
+        restoreSolution: '**/*.sln'
+        feedsToUse: 'select'
+        vstsFeed: '<your VSTS feed>' # Specify the NuGet feed containing the UiPath.Testing.Activity package.
+    - task: DownloadBuildArtifacts@0
+      displayName: 'Download Test Suite project'
+      inputs:
+        buildType: 'current'
+        downloadType: 'specific'
+        artifactName: 'TestSuite' # Specify the name of the artifact containing the UiPath Test Suite project.
+        downloadPath: '$(Build.ArtifactStagingDirectory)/TestSuite'
+    - script: |
+        cd '$(Build.ArtifactStagingDirectory)/TestSuite'
+        UiPath.Testing.Activity.exe -uipathTestSuite -testSuitePath 'Tests.xml' -resultPath 'Results.xml'
+      displayName: 'Run UiPath Tests'
