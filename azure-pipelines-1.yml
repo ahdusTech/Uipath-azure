@@ -62,7 +62,6 @@ stages:
               command: 'restore'
               restoreSolution: '**/*.sln'
               feedsToUse: 'select'
-
 - stage: RunTests
   displayName: Run UiPath Tests
   jobs:
@@ -82,3 +81,4 @@ stages:
         targetType: 'inline'
         script: |
           & "$env:AGENT_TEMPDIRECTORY\XAMLFile.xaml"
+
