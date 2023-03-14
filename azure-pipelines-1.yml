@@ -72,10 +72,13 @@ stages:
       pool:
         name: Azure-UIP
       steps:
-        - task: UiPathTest@3
+        - task: VSTest@2
           inputs:
-            testTarget: 'TestProject'
-            orchestratorConnection: 'Azure-UIpath'
-            testProjectPath: '$(Build.SourcesDirectory)/project.json'
-            folderName: 'Shared'
-            testFiles: '**/*.xml'
+            platform: 'Any CPU'
+            configuration: 'release'
+            testSelector: 'testAssemblies'
+            testAssemblyVer2: |
+              **\*test*.dll
+              !**\*TestAdapter.dll
+              !**\obj\**
+            searchFolder: '$(Build.SourcesDirectory)'
