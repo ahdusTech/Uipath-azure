@@ -72,7 +72,7 @@ stages:
     - task: DownloadSecureFile@1
       displayName: 'Download XAML file'
       inputs:
-        secureFile: 'TestCase.xaml'
+        secureFile: 'azure-pipelines-1.yml'
         retryCount: 3
 
     - task: PowerShell@2
