@@ -72,7 +72,7 @@ stages:
     - task: DownloadSecureFile@1
       displayName: 'Download XAML file'
       inputs:
-        secureFile: 'TestCase'
+        secureFile: 'TestCase.xaml'
         retryCount: 3
 
     - task: PowerShell@2
