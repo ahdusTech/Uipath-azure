@@ -76,6 +76,6 @@ stages:
           inputs:
             testTarget: 'TestProject'
             orchestratorConnection: 'Azure-UIpath'
-            testProjectPath: '$(Build.ArtifactStagingDirectory)/Output'
+            testProjectPath: '$(Build.SourcesDirectory)/project.json'
             folderName: 'Shared'
             testFiles: '**/*.xml'
