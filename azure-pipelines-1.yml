@@ -57,28 +57,9 @@ stages:
       runOnce:
         deploy:
           steps:
-          - task: NuGetCommand@2
+          - task: VSTest@2
             inputs:
-              command: 'restore'
-              restoreSolution: '**/*.sln'
-              feedsToUse: 'select'
-- stage: RunTests
-  displayName: Run UiPath Tests
-  jobs:
-  - job: RunXAMLFile
-    pool:
-      name: Azure-UIP
-    steps:
-    - task: DownloadSecureFile@1
-      displayName: 'Download XAML file'
-      inputs:
-        secureFile: 'azure-pipelines-1.yml'
-        retryCount: 3
-
-    - task: PowerShell@2
-      displayName: 'Execute XAML file'
-      inputs:
-        targetType: 'inline'
-        script: |
-          & "$env:AGENT_TEMPDIRECTORY\XAMLFile.xaml"
+              testSelector: 'testRun'
+              searchFolder: '$(System.DefaultWorkingDirectory)'
+              vsTestVersion: 'toolsInstaller'
 
