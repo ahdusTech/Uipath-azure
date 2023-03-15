@@ -77,22 +77,21 @@ stages:
       inputs:
         targetType: 'inline'
         script: |
-          # Install the Az.Repos module
-          Install-Module -Name Az.Repos -Force
-
-          # Import the Az.Repos module
-          Import-Module -Name Az.Repos -Force
-
-          # Get the list of repositories
-          $repos = Get-AzReposRepository -OrganizationName "<Azure-UIPath>" -ProjectName "<Azure-UIPath>"
-
-          # Loop through the repositories and test each one
-          foreach ($repo in $repos) {
-              $repoName = $repo.Name
-              $repoUrl = $repo.RemoteUrl
-              Write-Host "Testing $repoName at $repoUrl ..."
-              # add your testing command here
+          # Test the existence of project.json and .xmal files
+          $projectJsonPath = "$(System.DefaultWorkingDirectory)\_work\9\s\path\to\project.json"
+          if (Test-Path $projectJsonPath) {
+            Write-Host "project.json file exists at $projectJsonPath"
+          } else {
+            Write-Error "project.json file not found at $projectJsonPath"
           }
-    displayName: 'Test all code in Azure Repo'
+          
+          $xamlFilePath = "$(System.DefaultWorkingDirectory)\_work\9\s\path\to\file.xaml"
+          if (Test-Path $xamlFilePath) {
+            Write-Host "xaml file exists at $xamlFilePath"
+          } else {
+            Write-Error "xaml file not found at $xamlFilePath"
+          }
+    displayName: 'Test file existence'
+
 
 
