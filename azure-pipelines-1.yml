@@ -77,6 +77,8 @@ stages:
       inputs:
         targetType: 'inline'
         script: |
+          Import-Module -Name Az.Repos -Force
+
           $repos = Get-AzReposRepository -OrganizationName "<Azure-UIPath>" -ProjectName "<Azure-UIPath>"
 
           foreach ($repo in $repos) {
@@ -86,3 +88,4 @@ stages:
               # add your testing command here
           }
     displayName: 'Test all code in Azure Repo'
+
