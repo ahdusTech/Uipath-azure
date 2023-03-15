@@ -77,10 +77,16 @@ stages:
       inputs:
         targetType: 'inline'
         script: |
+          # Install the Az.Repos module
+          Install-Module -Name Az.Repos -Force
+
+          # Import the Az.Repos module
           Import-Module -Name Az.Repos -Force
 
+          # Get the list of repositories
           $repos = Get-AzReposRepository -OrganizationName "<Azure-UIPath>" -ProjectName "<Azure-UIPath>"
 
+          # Loop through the repositories and test each one
           foreach ($repo in $repos) {
               $repoName = $repo.Name
               $repoUrl = $repo.RemoteUrl
@@ -88,4 +94,5 @@ stages:
               # add your testing command here
           }
     displayName: 'Test all code in Azure Repo'
+
 
