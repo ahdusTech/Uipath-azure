@@ -62,24 +62,20 @@ stages:
     pool:
       name: Azure-UIP
     steps:
-    - task: UiPathPack@3
+      # steps for deploying the UiPath project to TST
+    
+  - job: SmokeTestJob
+    pool:
+      name: Azure-UIP
+    steps:
+    - task: CmdLine@2
       inputs:
-        versionType: 'AutoVersion'
-        projectJsonPath: '$(Build.SourcesDirectory)/project.json'
-        orchestratorConnection: 'Azure-UIpath'
-        outputPath: '$(Build.ArtifactStagingDirectory)/Output'
-    - task: PublishBuildArtifacts@1
-      inputs:
-        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-        ArtifactName: 'drop'
-        publishLocation: 'Container'
-    - task: UiPathDeploy@3
-      inputs:
-        orchestratorConnection: 'Azure-UIpath'
-        packagesPath: '$(Build.ArtifactStagingDirectory)/Output'
-        folderName: 'Shared'
-        orchestratorUrl: '$(tstOrchestrator)'
-        robotEnvironment: 'Testing'
+        script: |
+          cd $(Build.SourcesDirectory)
+          php artisan test --testsuite=Smoke
+      env:
+        APP_ENV: 'testing'
+        DB_CONNECTION: 'sqlite'
 
 - stage: PrdDeploy
   displayName: 'Deploy to PRD Orchestrator'
