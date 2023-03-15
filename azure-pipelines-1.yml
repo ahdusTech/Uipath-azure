@@ -35,21 +35,10 @@ stages:
     pool:
       name: Azure-UIP
     steps:
-    - task: UiPathPack@3
-      inputs:
-        versionType: 'AutoVersion'
-        projectJsonPath: '$(Build.SourcesDirectory)/project.json'
-        orchestratorConnection: 'Azure-UIpath'
-        outputPath: '$(Build.ArtifactStagingDirectory)/Output'
-    - task: PublishBuildArtifacts@1
-      inputs:
-        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-        ArtifactName: 'drop'
-        publishLocation: 'Container'
     - task: UiPathDeploy@3
       inputs:
         orchestratorConnection: 'Azure-UIpath'
-        packagesPath: '$(Build.ArtifactStagingDirectory)/Output'
+        packagesPath: '$(Pipeline.Workspace)/drop/Output'
         folderName: 'Shared'
         orchestratorUrl: '$(devOrchestrator)'
         robotEnvironment: 'Development'
@@ -62,8 +51,14 @@ stages:
     pool:
       name: Azure-UIP
     steps:
-      # steps for deploying the UiPath project to TST
-    
+    - task: UiPathDeploy@3
+      inputs:
+        orchestratorConnection: 'Azure-UIpath'
+        packagesPath: '$(Pipeline.Workspace)/drop/Output'
+        folderName: 'Shared'
+        orchestratorUrl: '$(tstOrchestrator)'
+        robotEnvironment: 'Testing'
+
   - job: SmokeTestJob
     pool:
       name: Azure-UIP
@@ -85,21 +80,8 @@ stages:
     pool:
       name: Azure-UIP
     steps:
-    - task: UiPathPack@3
-      inputs:
-        versionType: 'AutoVersion'
-        projectJsonPath: '$(Build.SourcesDirectory)/project.json'
-        orchestratorConnection: 'Azure-UIpath'
-        outputPath: '$(Build.ArtifactStagingDirectory)/Output'
-    - task: PublishBuildArtifacts@1
-      inputs:
-        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-        ArtifactName: 'drop'
-        publishLocation: 'Container'
     - task: UiPathDeploy@3
       inputs:
         orchestratorConnection: 'Azure-UIpath'
-        packagesPath: '$(Build.ArtifactStagingDirectory)/Output'
-        folderName: 'Shared'
-        orchestratorUrl: '$(prdOrchestrator)'
-        robotEnvironment: 'Production'
+        packagesPath: '$(Pipeline.Workspace)/drop/Output'
+        folderName:
