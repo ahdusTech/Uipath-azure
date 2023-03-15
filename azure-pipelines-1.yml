@@ -62,6 +62,17 @@ stages:
     pool:
       name: Azure-UIP
     steps:
+    - task: UiPathPack@3
+      inputs:
+        versionType: 'AutoVersion'
+        projectJsonPath: '$(Build.SourcesDirectory)/project.json'
+        orchestratorConnection: 'Azure-UIpath'
+        outputPath: '$(Build.ArtifactStagingDirectory)/Output'
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        ArtifactName: 'drop'
+        publishLocation: 'Container'
     - task: UiPathDeploy@3
       inputs:
         orchestratorConnection: 'Azure-UIpath'
@@ -78,6 +89,17 @@ stages:
     pool:
       name: Azure-UIP
     steps:
+    - task: UiPathPack@3
+      inputs:
+        versionType: 'AutoVersion'
+        projectJsonPath: '$(Build.SourcesDirectory)/project.json'
+        orchestratorConnection: 'Azure-UIpath'
+        outputPath: '$(Build.ArtifactStagingDirectory)/Output'
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        ArtifactName: 'drop'
+        publishLocation: 'Container'
     - task: UiPathDeploy@3
       inputs:
         orchestratorConnection: 'Azure-UIpath'
