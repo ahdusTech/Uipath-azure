@@ -3,6 +3,9 @@ trigger:
 
 variables:
   group: UiPath
+  devOrchestrator: 'https://dev.uipath.com/'
+  tstOrchestrator: 'https://tst.uipath.com/'
+  prdOrchestrator: 'https://prd.uipath.com/'
 
 stages:
 - stage: Build
@@ -23,75 +26,51 @@ stages:
         PathtoPublish: '$(Build.ArtifactStagingDirectory)'
         ArtifactName: 'drop'
         publishLocation: 'Container'
+
+- stage: DevDeploy
+  displayName: 'Deploy to DEV Orchestrator'
+  dependsOn: Build
+  jobs:
+  - job: DevDeployJob
+    pool:
+      name: Azure-UIP
+    steps:
     - task: UiPathDeploy@3
       inputs:
         orchestratorConnection: 'Azure-UIpath'
         packagesPath: '$(Build.ArtifactStagingDirectory)/Output'
         folderName: 'Shared'
+        orchestratorUrl: '$(devOrchestrator)'
+        robotEnvironment: 'Development'
 
-- stage: Asset
-  displayName: 'Create Assets'
+- stage: TstDeploy
+  displayName: 'Deploy to TST Orchestrator'
+  dependsOn: DevDeploy
   jobs:
-  - job: CreateAssets
+  - job: TstDeployJob
     pool:
       name: Azure-UIP
     steps:
-    - task: UiPathAssets@3
+    - task: UiPathDeploy@3
       inputs:
         orchestratorConnection: 'Azure-UIpath'
+        packagesPath: '$(Build.ArtifactStagingDirectory)/Output'
         folderName: 'Shared'
-        assetActionType: 'Deploy'
-        csvFile: '$(Build.SourcesDirectory)/Data/Assets.csv'
+        orchestratorUrl: '$(tstOrchestrator)'
+        robotEnvironment: 'Testing'
 
-- stage: DeployDEV
-  displayName: 'Deploy build artifact to DEV'
-  dependsOn: Build
-  condition: succeeded()
+- stage: PrdDeploy
+  displayName: 'Deploy to PRD Orchestrator'
+  dependsOn: TstDeploy
   jobs:
-  - deployment: deployDEV
-    displayName: 'Restore package to DEV Orchestrator'
+  - job: PrdDeployJob
     pool:
       name: Azure-UIP
-    environment: 'DEV'
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - task: VSTest@2
-            inputs:
-              testSelector: 'testAssemblies'
-              testAssemblyVer2: |
-                **\*test*.dll
-                !**\*TestAdapter.dll
-
-- stage: TestDEV
-  displayName: 'Test After Publish'
-  dependsOn: DeployDEV
-  condition: succeeded()
-  jobs:
-  - job: TestDEV
-    pool: 
-      name: Azure-UIP
     steps:
-    - task: PowerShell@2
+    - task: UiPathDeploy@3
       inputs:
-        targetType: 'inline'
-        script: |
-          # Test the existence of project.json and .xmal files
-          $projectJsonPath = "$(System.DefaultWorkingDirectory)\_work\9\s\path\to\project.json"
-          if (Test-Path $projectJsonPath) {
-            Write-Host "project.json file exists at $projectJsonPath"
-          } else {
-            Write-Error "project.json file not found at $projectJsonPath"
-          }
-          
-          $xamlFilePath = "$(System.DefaultWorkingDirectory)\_work\9\s\path\to\file.xaml"
-          if (Test-Path $xamlFilePath) {
-            Write-Host "xaml file exists at $xamlFilePath"
-          } else {
-            Write-Error "xaml file not found at $xamlFilePath"
-          }
-    displayName: 'Test file existence'
-
-
-
+        orchestratorConnection: 'Azure-UIpath'
+        packagesPath: '$(Build.ArtifactStagingDirectory)/Output'
+        folderName: 'Shared'
+        orchestratorUrl: '$(prdOrchestrator)'
+        robotEnvironment: 'Production'
