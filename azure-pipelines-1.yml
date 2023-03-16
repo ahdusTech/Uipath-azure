@@ -53,14 +53,14 @@ stages:
   jobs:
   - job: Run_Unit_Tests
     displayName: Run Unit Tests
-  pool:
-    vmImage: 'Azure-UIP'
-  steps:
-  - task: NodeTool@0
-    inputs:
-      versionSpec: '14.x'
-    displayName: 'Install Node.js'
-  - script: |
-      npm install
-      npm run test
-    displayName: 'Run Unit Tests'
+    pool:
+      name: 'Azure-UIP'
+    steps:
+    - task: NodeTool@0
+      inputs:
+        versionSpec: '14.x'
+      displayName: 'Install Node.js'
+    - script: |
+        npm install
+        npm run test
+      displayName: 'Run Unit Tests'
