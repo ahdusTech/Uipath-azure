@@ -30,7 +30,7 @@ stages:
   displayName: Create Assests
   jobs:
       - job: CreateAssests
-        pool: UiPath
+        pool: Azure-UIP
         steps:
         - task: UiPathAssets@3
           inputs:
