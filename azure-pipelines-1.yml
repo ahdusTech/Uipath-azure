@@ -52,7 +52,7 @@ stages:
     - task: UiPathDeploy@3
       inputs:
         orchestratorConnection: 'Azure-UIpath'
-        packagesPath: '$(Pipeline.Workspace)/drop/Output'
+        packagesPath: '$(Build.ArtifactStagingDirectory)/drop/Output'
         folderName: 'Shared'
         orchestratorUrl: '$(devOrchestrator)'
         robotEnvironment: 'Development'
