@@ -50,15 +50,15 @@ $folderName = "Shared"
 $orchestratorConnection = "Azure-UIpath"
 $artifactName = "drop"
 
-# Pack the UiPath project
+  # Pack the UiPath project
 $packCommand = "UiPath.Pack.exe pack `"$projectJsonPath`" --output `"$outputPath`" --versionType AutoVersion --orchestrator `"$orchestratorConnection`""
 Invoke-Expression $packCommand
 
-# Deploy the package to UiPath Orchestrator
+ # Deploy the package to UiPath Orchestrator
 $deployCommand = "UiPath.Deploy.exe deploy `"$outputPath`" --url `"$orchestratorUrl`" --username `"$userName`" --password `"$password`" --package `"$packageName`" --environment `"$robotEnvironment`" --folder `"$folderName`""
 Invoke-Expression $deployCommand
 
-# Publish the build artifact to Azure DevOps
+ # Publish the build artifact to Azure DevOps
 $publishCommand = "az artifacts universal publish --organization `"$organizationURL`" --project `"$projectName`" --feed `"$feedName`" --name `"$artifactName`" --version `"$Build.BuildNumber`" --type `"$artifactType`" --path `"$outputPath`""
 Invoke-Expression $publishCommand
 
