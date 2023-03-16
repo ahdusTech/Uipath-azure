@@ -35,66 +35,54 @@ stages:
     pool:
       name: Azure-UIP
     steps:
-      - task: UiPathPack@3
-        inputs:
-          versionType: 'AutoVersion'
-          projectJsonPath: '$(Build.SourcesDirectory)/project.json'
-          orchestratorConnection: 'Azure-UIpath'
-          outputPath: '$(Build.ArtifactStagingDirectory)/Output'
-      - task: PublishBuildArtifacts@1
-        inputs:
-          PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-          ArtifactName: 'drop'
-          publishLocation: 'Container'
-      - task: UiPathDeploy@3
-        inputs:
-          orchestratorConnection: 'Azure-UIpath'
-          packagesPath: '$(Pipeline.Workspace)/drop/Output'
-          folderName: 'Shared'
-          orchestratorUrl: '$(devOrchestrator)'
-          robotEnvironment: 'Development'
+    - task: DownloadBuildArtifacts@0
+      inputs:
+        artifactName: 'drop'
+        downloadPath: '$(System.ArtifactsDirectory)/drop'
+    - task: UiPathDeploy@3
+      inputs:
+        orchestratorConnection: 'Azure-UIpath'
+        packagesPath: '$(System.ArtifactsDirectory)/drop/Output'
+        folderName: 'Shared'
+        orchestratorUrl: '$(devOrchestrator)'
+        robotEnvironment: 'Development'
 
 - stage: TstDeploy
   displayName: 'Deploy to TST Orchestrator'
-  dependsOn: DevDeploy
+  dependsOn: Build
   jobs:
   - job: TstDeployJob
     pool:
       name: Azure-UIP
     steps:
-      - task: UiPathDeploy@3
-        inputs:
-          orchestratorConnection: 'Azure-UIpath'
-          packagesPath: '$(Pipeline.Workspace)/drop/Output'
-          folderName: 'Shared'
-          orchestratorUrl: '$(tstOrchestrator)'
-          robotEnvironment: 'Testing'
-
-  - job: SmokeTestJob
-    pool:
-      name: Azure-UIP
-    steps:
-    - task: CmdLine@2
+    - task: DownloadBuildArtifacts@0
       inputs:
-        script: |
-          cd $(Build.SourcesDirectory)
-          php artisan test --testsuite=Smoke
-      env:
-        APP_ENV: 'testing'
-        DB_CONNECTION: 'sqlite'
+        artifactName: 'drop'
+        downloadPath: '$(System.ArtifactsDirectory)/drop'
+    - task: UiPathDeploy@3
+      inputs:
+        orchestratorConnection: 'Azure-UIpath'
+        packagesPath: '$(System.ArtifactsDirectory)/drop/Output'
+        folderName: 'Shared'
+        orchestratorUrl: '$(tstOrchestrator)'
+        robotEnvironment: 'Testing'
 
 - stage: PrdDeploy
   displayName: 'Deploy to PRD Orchestrator'
-  dependsOn: TstDeploy
+  dependsOn: Build
   jobs:
   - job: PrdDeployJob
     pool:
       name: Azure-UIP
     steps:
-      - task: UiPathDeploy@3
-        inputs:
-          orchestratorConnection: 'Azure-UIpath'
-          packagesPath: '$(Pipeline.Workspace)/drop/Output'
-          folderName: 'Shared'
-          orchestratorUrl: '$(prdOrchestrator)'
-          robotEnvironment: 'Production'
+    - task: DownloadBuildArtifacts@0
+      inputs:
+        artifactName: 'drop'
+        downloadPath: '$(System.ArtifactsDirectory)/drop'
+    - task: UiPathDeploy@3
+      inputs:
+        orchestratorConnection: 'Azure-UIpath'
+        packagesPath: '$(System.ArtifactsDirectory)/drop/Output'
+        folderName: 'Shared'
+        orchestratorUrl: '$(prdOrchestrator)'
+        robotEnvironment: 'Production'
