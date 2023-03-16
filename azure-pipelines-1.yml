@@ -27,18 +27,19 @@ stages:
         ArtifactName: 'drop'
         publishLocation: 'Container'
 
-- stage: Assest
-  displayName: Create Assests
+- stage: Asset
+  displayName: 'Create assets'
   jobs:
-  - job: CreateAssests
-    pool: Azure-UIP
+  - job: CreateAssets
+    pool:
+      name: Azure-UIP
     steps:
     - task: UiPathAssets@3
       inputs:
         orchestratorConnection: 'Azure-UIpath'
         folderName: 'Shared'
         assetActionType: 'Deploy'
-        csvFile: '$(Build.SourcesDirectory)\Data\Assets.csv'
+        csvFile: '$(Build.SourcesDirectory)/Data/Assets.csv'
 
 - stage: DevDeploy
   displayName: 'Deploy to DEV Orchestrator'
@@ -48,21 +49,10 @@ stages:
     pool:
       name: Azure-UIP
     steps:
-    - task: UiPathPack@3
-      inputs:
-        versionType: 'AutoVersion'
-        projectJsonPath: '$(Build.SourcesDirectory)/project.json'
-        orchestratorConnection: 'Azure-UIpath'
-        outputPath: '$(Build.ArtifactStagingDirectory)/Output'
-    - task: PublishBuildArtifacts@1
-      inputs:
-        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-        ArtifactName: 'drop'
-        publishLocation: 'Container'
     - task: UiPathDeploy@3
       inputs:
         orchestratorConnection: 'Azure-UIpath'
-        packagesPath: '$(Build.ArtifactStagingDirectory)/Output'
+        packagesPath: '$(Pipeline.Workspace)/drop/Output'
         folderName: 'Shared'
         orchestratorUrl: '$(devOrchestrator)'
         robotEnvironment: 'Development'
@@ -71,25 +61,30 @@ stages:
   displayName: 'Deploy to TST Orchestrator'
   dependsOn: DevDeploy
   jobs:
+  - job: TestJob
+    displayName: 'Run tests'
+    pool:
+      name: Azure-UIP
+    steps:
+    - task: DownloadPipelineArtifact@2
+      inputs:
+        artifact: 'drop'
+        path: '$(Build.ArtifactStagingDirectory)'
+      displayName: 'Download artifact'
+    - task: UiPathTest@3
+      inputs:
+        orchestratorConnection: 'Azure-UIpath'
+        testSuitePath: '$(Build.ArtifactStagingDirectory)/Output/Tests/MyTestSuite.xml'
+        robotEnvironment: 'Testing'
+
   - job: TstDeployJob
     pool:
       name: Azure-UIP
     steps:
-    - task: UiPathPack@3
-      inputs:
-        versionType: 'AutoVersion'
-        projectJsonPath: '$(Build.SourcesDirectory)/project.json'
-        orchestratorConnection: 'Azure-UIpath'
-        outputPath: '$(Build.ArtifactStagingDirectory)/Output'
-    - task: PublishBuildArtifacts@1
-      inputs:
-        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-        ArtifactName: 'drop'
-        publishLocation: 'Container'
     - task: UiPathDeploy@3
       inputs:
         orchestratorConnection: 'Azure-UIpath'
-        packagesPath: '$(Build.ArtifactStagingDirectory)/Output'
+        packagesPath: '$(Pipeline.Workspace)/drop/Output'
         folderName: 'Shared'
         orchestratorUrl: '$(tstOrchestrator)'
         robotEnvironment: 'Testing'
