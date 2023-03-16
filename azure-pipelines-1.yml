@@ -41,7 +41,7 @@ stages:
         assetActionType: 'Deploy'
         csvFile: '$(Build.SourcesDirectory)/Data/Assets.csv'
 
-# Define variables
+ # Define variables
 $projectJsonPath = "$(Build.SourcesDirectory)/project.json"
 $outputPath = "$(Build.ArtifactStagingDirectory)/Output"
 $orchestratorUrl = "$(devOrchestrator)"
