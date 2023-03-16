@@ -35,18 +35,24 @@ stages:
     pool:
       name: Azure-UIP
     steps:
-    - task: PublishBuildArtifacts@1
-      inputs:
-        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-        ArtifactName: 'drop'
-        publishLocation: 'Container'
-    - task: UiPathDeploy@3
-      inputs:
-        orchestratorConnection: 'Azure-UIpath'
-        packagesPath: '$(Pipeline.Workspace)/drop/Output'
-        folderName: 'Shared'
-        orchestratorUrl: '$(devOrchestrator)'
-        robotEnvironment: 'Development'
+      - task: UiPathPack@3
+        inputs:
+          versionType: 'AutoVersion'
+          projectJsonPath: '$(Build.SourcesDirectory)/project.json'
+          orchestratorConnection: 'Azure-UIpath'
+          outputPath: '$(Build.ArtifactStagingDirectory)/Output'
+      - task: PublishBuildArtifacts@1
+        inputs:
+          PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+          ArtifactName: 'drop'
+          publishLocation: 'Container'
+      - task: UiPathDeploy@3
+        inputs:
+          orchestratorConnection: 'Azure-UIpath'
+          packagesPath: '$(Pipeline.Workspace)/drop/Output'
+          folderName: 'Shared'
+          orchestratorUrl: '$(devOrchestrator)'
+          robotEnvironment: 'Development'
 
 - stage: TstDeploy
   displayName: 'Deploy to TST Orchestrator'
@@ -56,13 +62,13 @@ stages:
     pool:
       name: Azure-UIP
     steps:
-    - task: UiPathDeploy@3
-      inputs:
-        orchestratorConnection: 'Azure-UIpath'
-        packagesPath: '$(Pipeline.Workspace)/drop/Output'
-        folderName: 'Shared'
-        orchestratorUrl: '$(tstOrchestrator)'
-        robotEnvironment: 'Testing'
+      - task: UiPathDeploy@3
+        inputs:
+          orchestratorConnection: 'Azure-UIpath'
+          packagesPath: '$(Pipeline.Workspace)/drop/Output'
+          folderName: 'Shared'
+          orchestratorUrl: '$(tstOrchestrator)'
+          robotEnvironment: 'Testing'
 
   - job: SmokeTestJob
     pool:
@@ -85,8 +91,10 @@ stages:
     pool:
       name: Azure-UIP
     steps:
-    - task: UiPathDeploy@3
-      inputs:
-        orchestratorConnection: 'Azure-UIpath'
-        packagesPath: '$(Pipeline.Workspace)/drop/Output'
-        folderName:
+      - task: UiPathDeploy@3
+        inputs:
+          orchestratorConnection: 'Azure-UIpath'
+          packagesPath: '$(Pipeline.Workspace)/drop/Output'
+          folderName: 'Shared'
+          orchestratorUrl: '$(prdOrchestrator)'
+          robotEnvironment: 'Production'
