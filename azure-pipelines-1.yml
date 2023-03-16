@@ -1,77 +1,60 @@
 trigger:
 - main
 
+pool:
+  name: Azure-UIP
+
 variables:
   group: UiPath
   devOrchestrator: 'https://dev.uipath.com/'
   tstOrchestrator: 'https://tst.uipath.com/'
   prdOrchestrator: 'https://prd.uipath.com/'
+  projectJsonPath: "$(Build.SourcesDirectory)/project.json"
+  outputPath: "$(Build.ArtifactStagingDirectory)/Output"
+  orchestratorUrl: "$(devOrchestrator)"
+  robotEnvironment: "Development"
+  folderName: "Shared"
+  orchestratorConnection: "Azure-UIpath"
+  artifactName: "drop"
 
 stages:
 - stage: Build
   displayName: 'Create build artifact'
   jobs:
   - job: BuildArtifact
-    pool:
-      name: Azure-UIP
     steps:
     - task: UiPathPack@3
       inputs:
         versionType: 'AutoVersion'
-        projectJsonPath: '$(Build.SourcesDirectory)/project.json'
-        orchestratorConnection: 'Azure-UIpath'
-        outputPath: '$(Build.ArtifactStagingDirectory)/Output'
+        projectJsonPath: '$(projectJsonPath)'
+        orchestratorConnection: '$(orchestratorConnection)'
+        outputPath: '$(outputPath)'
     - task: PublishBuildArtifacts@1
       inputs:
-        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-        ArtifactName: 'drop'
+        PathtoPublish: '$(outputPath)'
+        ArtifactName: '$(artifactName)'
         publishLocation: 'Container'
 
 - stage: Asset
   displayName: 'Create assets'
   jobs:
-  - job: CreateAssets:
-    pool:
-      name: Azure-UIP
+  - job: CreateAssets
     steps:
     - task: UiPathAssets@3
       inputs:
-        orchestratorConnection: 'Azure-UIpath'
-        folderName: 'Shared'
+        orchestratorConnection: '$(orchestratorConnection)'
+        folderName: '$(folderName)'
         assetActionType: 'Deploy'
         csvFile: '$(Build.SourcesDirectory)/Data/Assets.csv'
 
- # Define variables
-$projectJsonPath = "$(Build.SourcesDirectory)/project.json"
-$outputPath = "$(Build.ArtifactStagingDirectory)/Output"
-$orchestratorUrl = "$(devOrchestrator)"
-$robotEnvironment = "Development"
-$folderName = "Shared"
-$orchestratorConnection = "Azure-UIpath"
-$artifactName = "drop"
-
-  # Pack the UiPath project
-$packCommand = "UiPath.Pack.exe pack `"$projectJsonPath`" --output `"$outputPath`" --versionType AutoVersion --orchestrator `"$orchestratorConnection`""
-Invoke-Expression $packCommand
-
- # Deploy the package to UiPath Orchestrator
-$deployCommand = "UiPath.Deploy.exe deploy `"$outputPath`" --url `"$orchestratorUrl`" --username `"$userName`" --password `"$password`" --package `"$packageName`" --environment `"$robotEnvironment`" --folder `"$folderName`""
-Invoke-Expression $deployCommand
-
- # Publish the build artifact to Azure DevOps
-$publishCommand = "az artifacts universal publish --organization `"$organizationURL`" --project `"$projectName`" --feed `"$feedName`" --name `"$artifactName`" --version `"$Build.BuildNumber`" --type `"$artifactType`" --path `"$outputPath`""
-Invoke-Expression $publishCommand
-
 - stage: TstDeploy
   displayName: 'Deploy to TST Orchestrator'
-  dependsOn: DevDeploy
+  dependsOn: Build
   jobs:
   - job: TestJob
     displayName: 'Run tests'
-    pool:
-      name: Azure-UIP
     steps:
     - task: DownloadPipelineArtifact@2
       inputs:
-        artifact: 'drop'
+        artifact: '$(artifactName)'
         path: '$(Build.ArtifactStagingDirectory)'
