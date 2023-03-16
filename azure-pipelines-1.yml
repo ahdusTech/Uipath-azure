@@ -41,21 +41,27 @@ stages:
         assetActionType: 'Deploy'
         csvFile: '$(Build.SourcesDirectory)/Data/Assets.csv'
 
-- stage: DevDeploy
-  displayName: 'Deploy to DEV Orchestrator'
-  dependsOn: Build
-  jobs:
-  - job: DevDeployJob
-    pool:
-      name: Azure-UIP
-    steps:
-    - task: UiPathDeploy@3
-      inputs:
-        orchestratorConnection: 'Azure-UIpath'
-        packagesPath: 'C:\agent\_work\9\drop\Output'
-        folderName: 'Shared'
-        orchestratorUrl: '$(devOrchestrator)'
-        robotEnvironment: 'Development'
+# Define variables
+$projectJsonPath = "$(Build.SourcesDirectory)/project.json"
+$outputPath = "$(Build.ArtifactStagingDirectory)/Output"
+$orchestratorUrl = "$(devOrchestrator)"
+$robotEnvironment = "Development"
+$folderName = "Shared"
+$orchestratorConnection = "Azure-UIpath"
+$artifactName = "drop"
+
+# Pack the UiPath project
+$packCommand = "UiPath.Pack.exe pack `"$projectJsonPath`" --output `"$outputPath`" --versionType AutoVersion --orchestrator `"$orchestratorConnection`""
+Invoke-Expression $packCommand
+
+# Deploy the package to UiPath Orchestrator
+$deployCommand = "UiPath.Deploy.exe deploy `"$outputPath`" --url `"$orchestratorUrl`" --username `"$userName`" --password `"$password`" --package `"$packageName`" --environment `"$robotEnvironment`" --folder `"$folderName`""
+Invoke-Expression $deployCommand
+
+# Publish the build artifact to Azure DevOps
+$publishCommand = "az artifacts universal publish --organization `"$organizationURL`" --project `"$projectName`" --feed `"$feedName`" --name `"$artifactName`" --version `"$Build.BuildNumber`" --type `"$artifactType`" --path `"$outputPath`""
+Invoke-Expression $publishCommand
+
 - stage: TstDeploy
   displayName: 'Deploy to TST Orchestrator'
   dependsOn: DevDeploy
