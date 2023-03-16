@@ -30,7 +30,7 @@ stages:
 - stage: Asset
   displayName: 'Create assets'
   jobs:
-  - job: CreateAssets
+  - job: CreateAssets:
     pool:
       name: Azure-UIP
     steps:
@@ -75,9 +75,3 @@ Invoke-Expression $publishCommand
       inputs:
         artifact: 'drop'
         path: '$(Build.ArtifactStagingDirectory)'
-      displayName: 'Download artifact'
-    - task: UiPathTest@3
-      inputs:
-        orchestratorConnection: 'Azure-UIpath'
-        testSuitePath: '$(Build.ArtifactStagingDirectory)/Output/Tests/MyTestSuite.xml'
-        robotEnvironment: 'Testing'
