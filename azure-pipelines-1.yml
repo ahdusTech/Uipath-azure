@@ -52,11 +52,10 @@ stages:
     - task: UiPathDeploy@3
       inputs:
         orchestratorConnection: 'Azure-UIpath'
-        packagesPath: '$(Build.ArtifactStagingDirectory)/drop/Output'
+        packagesPath: 'C:\agent\_work\9\drop\Output'
         folderName: 'Shared'
         orchestratorUrl: '$(devOrchestrator)'
         robotEnvironment: 'Development'
-
 - stage: TstDeploy
   displayName: 'Deploy to TST Orchestrator'
   dependsOn: DevDeploy
