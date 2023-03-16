@@ -54,7 +54,8 @@ stages:
   - job: TestJob
     displayName: 'Run tests'
     steps:
-    - task: DownloadPipelineArtifact@2
+    - task: UiPathTest@3
       inputs:
-        artifact: '$(artifactName)'
-        path: '$(Build.ArtifactStagingDirectory)'
+        testTarget: 'TestProject'
+        orchestratorConnection: 'Azure-UIpath'
+        folderName: 'Shared'
