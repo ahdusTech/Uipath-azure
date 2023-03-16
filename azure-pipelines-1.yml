@@ -19,72 +19,103 @@ stages:
       inputs:
         versionType: 'AutoVersion'
         projectJsonPath: '$(Build.SourcesDirectory)/project.json'
-        orchestratorConnection: 'Azure-UIpath'
+        orchestratorConnection: 'Azure-Devops-integration'
         outputPath: '$(Build.ArtifactStagingDirectory)/Output'
     - task: PublishBuildArtifacts@1
       inputs:
         PathtoPublish: '$(Build.ArtifactStagingDirectory)'
         ArtifactName: 'drop'
         publishLocation: 'Container'
-
-- stage: Package
-  displayName: 'Package and publish artifact'
-  dependsOn: Build
+- stage: Assest
+  displayName: Create Assests
   jobs:
-  - job: PackageJob
-    pool:
-      name: Azure-UIP
-    steps:
-    - task: DownloadBuildArtifacts@0
-      inputs:
-        artifactName: 'drop'
-        downloadPath: '$(System.ArtifactsDirectory)/drop'
-    - task: UiPathPack@3
-      inputs:
-        versionType: 'AutoVersion'
-        projectJsonPath: '$(Build.SourcesDirectory)/project.json'
-        orchestratorConnection: 'Azure-UIpath'
-        outputPath: '$(System.ArtifactsDirectory)/packaged'
-    - task: PublishBuildArtifacts@1
-      inputs:
-        PathtoPublish: '$(System.ArtifactsDirectory)/packaged'
-        ArtifactName: 'packaged'
-        publishLocation: 'Container'
+      - job: CreateAssests
+        pool: UiPath
+        steps:
+        - task: UiPathAssets@3
+          inputs:
+            orchestratorConnection: 'Azure-UIpath'
+            folderName: 'Shared'
+            assetActionType: 'Deploy'
+            csvFile: '$(Build.SourcesDirectory)\Data\Assets.csv'
 
 - stage: DevDeploy
   displayName: 'Deploy to DEV Orchestrator'
-  dependsOn: Package
+  dependsOn: Build
   jobs:
   - job: DevDeployJob
     pool:
       name: Azure-UIP
     steps:
-    - task: DownloadBuildArtifacts@0
+    - task: UiPathPack@3
       inputs:
-        artifactName: 'packaged'
-        downloadPath: '$(System.ArtifactsDirectory)/packaged'
+        versionType: 'AutoVersion'
+        projectJsonPath: '$(Build.SourcesDirectory)/project.json'
+        orchestratorConnection: 'Azure-Devops-integration'
+        outputPath: '$(Build.ArtifactStagingDirectory)/Output'
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        ArtifactName: 'drop'
+        publishLocation: 'Container'
     - task: UiPathDeploy@3
       inputs:
         orchestratorConnection: 'Azure-UIpath'
-        packagesPath: '$(System.ArtifactsDirectory)/packaged'
+        packagesPath: '$(Build.ArtifactStagingDirectory)/Output'
         folderName: 'Shared'
         orchestratorUrl: '$(devOrchestrator)'
         robotEnvironment: 'Development'
 
 - stage: TstDeploy
   displayName: 'Deploy to TST Orchestrator'
-  dependsOn: Package
+  dependsOn: DevDeploy
   jobs:
   - job: TstDeployJob
     pool:
       name: Azure-UIP
     steps:
-    - task: DownloadBuildArtifacts@0
+    - task: UiPathPack@3
       inputs:
-        artifactName: 'packaged'
-        downloadPath: '$(System.ArtifactsDirectory)/packaged'
+        versionType: 'AutoVersion'
+        projectJsonPath: '$(Build.SourcesDirectory)/project.json'
+        orchestratorConnection: 'Azure-Devops-integration'
+        outputPath: '$(Build.ArtifactStagingDirectory)/Output'
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        ArtifactName: 'drop'
+        publishLocation: 'Container'
     - task: UiPathDeploy@3
       inputs:
         orchestratorConnection: 'Azure-UIpath'
-        packagesPath: '$(System.ArtifactsDirectory)/packaged'
-       
+        packagesPath: '$(Build.ArtifactStagingDirectory)/Output'
+        folderName: 'Shared'
+        orchestratorUrl: '$(tstOrchestrator)'
+        robotEnvironment: 'Testing'
+
+- stage: PrdDeploy
+  displayName: 'Deploy to PRD Orchestrator'
+  dependsOn: TstDeploy
+  jobs:
+  - job: PrdDeployJob
+    pool:
+      name: Azure-UIP
+    steps:
+    - task: UiPathPack@3
+      inputs:
+        versionType: 'AutoVersion'
+        projectJsonPath: '$(Build.SourcesDirectory)/project.json'
+        orchestratorConnection: 'Azure-Devops-integration'
+        outputPath: '$(Build.ArtifactStagingDirectory)/Output'
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        ArtifactName: 'drop'
+        publishLocation: 'Container'
+    - task: UiPathDeploy@3
+      inputs:
+        orchestratorConnection: 'Azure-UIpath'
+        packagesPath: '$(Build.ArtifactStagingDirectory)/Output'
+        folderName: 'Shared'
+        orchestratorUrl: '$(prdOrchestrator)'
+        robotEnvironment: 'Production'
