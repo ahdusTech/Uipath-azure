@@ -51,7 +51,7 @@ stages:
       inputs:
         versionType: 'AutoVersion'
         projectJsonPath: '$(Build.SourcesDirectory)/project.json'
-        orchestratorConnection: 'Azure-Devops-integration'
+        orchestratorConnection: 'Azure-UIpath'
         outputPath: '$(Build.ArtifactStagingDirectory)/Output'
     - task: PublishBuildArtifacts@1
       inputs:
