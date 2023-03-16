@@ -81,15 +81,3 @@ Invoke-Expression $publishCommand
         orchestratorConnection: 'Azure-UIpath'
         testSuitePath: '$(Build.ArtifactStagingDirectory)/Output/Tests/MyTestSuite.xml'
         robotEnvironment: 'Testing'
-
-  - job: TstDeployJob
-    pool:
-      name: Azure-UIP
-    steps:
-    - task: UiPathDeploy@3
-      inputs:
-        orchestratorConnection: 'Azure-UIpath'
-        packagesPath: '$(Pipeline.Workspace)/drop/Output'
-        folderName: 'Shared'
-        orchestratorUrl: '$(tstOrchestrator)'
-        robotEnvironment: 'Testing'
