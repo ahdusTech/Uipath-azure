@@ -25,7 +25,7 @@ stages:
         outputPath: '$(Build.ArtifactStagingDirectory)'
     - publish: 
       artifact: drop 
-      path: '$(Build.ArtifactStagingDirectory)'
+      path: '$(Build.ArtifactStagingDirectory)\drop'
 
 - stage: Asset
   displayName: 'Create assets'
