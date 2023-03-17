@@ -21,7 +21,7 @@ stages:
         versionType: 'AutoVersion'
         projectJsonPath: '$(Build.SourcesDirectory)/project.json'
         outputType: 'Process'
-        orchestratorConnection: 'Azure-UIP'
+        orchestratorConnection: 'Azure-Uipath'
         outputPath: '$(Build.ArtifactStagingDirectory)'
     - task: PublishBuildArtifacts@1
       inputs:
@@ -36,7 +36,7 @@ stages:
     steps:
     - task: UiPathAssets@3
       inputs:
-        orchestratorConnection: '$(Azure-UIP)'
+        orchestratorConnection: '$(Azure-Uipath)'
         folderName: 'Shared'
         assetActionType: 'Deploy'
         csvFile: '$(Build.SourcesDirectory)/Data/Assets.csv'
@@ -59,3 +59,4 @@ stages:
               orchestratorConnection: 'Azure-UIpath'
               packagesPath: '$(Pipeline.Workspace)\drop'
               folderName: 'Shared'
+
