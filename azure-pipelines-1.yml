@@ -36,7 +36,7 @@ stages:
     steps:
     - task: UiPathAssets@3
       inputs:
-        orchestratorConnection: '$(Azure-Uipath)'
+        orchestratorConnection: 'Azure-UIpath'
         folderName: 'Shared'
         assetActionType: 'Deploy'
         csvFile: '$(Build.SourcesDirectory)/Data/Assets.csv'
