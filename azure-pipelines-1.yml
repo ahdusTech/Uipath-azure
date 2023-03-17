@@ -20,13 +20,13 @@ stages:
         outputPath: '$(Build.ArtifactStagingDirectory)'
     - task: PublishBuildArtifacts@1
       inputs:
-        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)\Output'
         ArtifactName: 'drop'
         publishLocation: 'Container'
     - task: UiPathDeploy@3
       inputs:
         orchestratorConnection: 'Azure-UIpath'
-        packagesPath: '$(Pipeline.Workspace)\drop'
+        packagesPath: '$(Build.ArtifactStagingDirectory)\Output'
         folderName: 'Shared'
         environments: 'DEV'
 - stage: Assest
