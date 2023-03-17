@@ -24,8 +24,9 @@ stages:
         orchestratorConnection: 'Azure-UIP'
         outputPath: '$(Build.ArtifactStagingDirectory)'
     - publish: 
-        artifact: drop 
-        path: '$(Build.ArtifactStagingDirectory)'
+      artifact: drop 
+      path: '$(Build.ArtifactStagingDirectory)'
+
 
 - stage: Asset
   displayName: 'Create assets'
@@ -55,5 +56,5 @@ stages:
           - task: UiPathDeploy@3
             inputs:
               orchestratorConnection: 'Azure-UIpath'
-              packagesPath: '$(Pipeline.Workspace)/drop'
+              packagesPath: '$(Pipeline.Workspace)\drop'
               folderName: 'Shared'
