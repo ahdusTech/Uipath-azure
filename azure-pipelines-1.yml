@@ -9,6 +9,7 @@ variables:
   devOrchestrator: 'https://dev.uipath.com/'
   tstOrchestrator: 'https://tst.uipath.com/'
   prdOrchestrator: 'https://prd.uipath.com/'
+
 stages:
 - stage: Build
   displayName: 'Create build artifact'
@@ -18,12 +19,14 @@ stages:
     - task: UiPathPack@3
       inputs:
         versionType: 'AutoVersion'
-        projectJsonPath: '$(Build.SourcesDirectory)\project.json'
+        projectJsonPath: '$(Build.SourcesDirectory)/project.json'
         outputType: 'Process'
-        orchestratorConnection: 'Azure-UIpath'
+        orchestratorConnection: 'Azure-UIP'
         outputPath: '$(Build.ArtifactStagingDirectory)'
--publish: $(Build.ArtifactStagingDirectory)
- artifact: drop 
+    - publish: 
+      artifact: drop 
+path: '$(Build.ArtifactStagingDirectory)'
+
 - stage: Asset
   displayName: 'Create assets'
   jobs:
@@ -31,7 +34,7 @@ stages:
     steps:
     - task: UiPathAssets@3
       inputs:
-        orchestratorConnection: '$(Azure-UIpath)'
+        orchestratorConnection: '$(Azure-UIP)'
         folderName: '$(folderName)'
         assetActionType: 'Deploy'
         csvFile: '$(Build.SourcesDirectory)/Data/Assets.csv'
