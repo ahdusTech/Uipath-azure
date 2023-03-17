@@ -18,8 +18,11 @@ stages:
         outputType: 'Process'
         orchestratorConnection: 'Azure-Uipath'
         outputPath: '$(Build.ArtifactStagingDirectory)'
-    - publish: $(Build.ArtifactStagingDirectory)
-      artifact: drop
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        ArtifactName: 'drop'
+        publishLocation: 'Container'
     - task: UiPathDeploy@3
       inputs:
         orchestratorConnection: 'Azure-UIpath'
