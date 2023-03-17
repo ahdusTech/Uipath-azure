@@ -59,4 +59,8 @@ stages:
               orchestratorConnection: 'Azure-UIpath'
               packagesPath: '$(Pipeline.Workspace)\drop'
               folderName: 'Shared'
+    variables:
+            - name: packagePath
+              value: 'C:\Users\Devops\.nuget\packages'
+
 
