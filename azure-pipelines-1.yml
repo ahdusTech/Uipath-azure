@@ -17,7 +17,7 @@ stages:
         projectJsonPath: '$(Build.SourcesDirectory)\project.json'
         outputType: 'Process'
         orchestratorConnection: 'Azure-Uipath'
-        outputPath: '$(Build.ArtifactStagingDirectory)'
+        outputPath: '$(Build.ArtifactStagingDirectory)\Output'
     - task: PublishBuildArtifacts@1
       inputs:
         PathtoPublish: '$(Build.ArtifactStagingDirectory)'
