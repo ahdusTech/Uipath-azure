@@ -17,15 +17,16 @@ stages:
   - job: BuildArtifact
     steps:
     - task: UiPathPack@3
-      inputs:
-        versionType: 'AutoVersion'
-        projectJsonPath: '$(Build.SourcesDirectory)/project.json'
-        outputType: 'Process'
-        orchestratorConnection: 'Azure-UIP'
-        outputPath: '$(Build.ArtifactStagingDirectory)'
-    - publish: 
-      artifact: drop 
-      path: '$(Build.ArtifactStagingDirectory)\drop'
+  inputs:
+    versionType: 'AutoVersion'
+    projectJsonPath: '$(Build.SourcesDirectory)/project.json'
+    outputType: 'Process'
+    orchestratorConnection: 'Azure-UIP'
+    outputPath: '$(Build.ArtifactStagingDirectory)'
+ - publish: 
+     artifact: drop 
+    path: '$(Build.ArtifactStagingDirectory)'
+
 
 - stage: Asset
   displayName: 'Create assets'
