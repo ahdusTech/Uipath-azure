@@ -41,5 +41,5 @@ stages:
     - task: UiPathDeploy@3
       inputs:
         orchestratorConnection: 'Azure-UIpath'
-        packagesPath: '$(Build.ArtifactStagingDirectory)\Output'
+        packagesPath: 'C:\agent\_work\9\drop'
         folderName: 'Shared'
