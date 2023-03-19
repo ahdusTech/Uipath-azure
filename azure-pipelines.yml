@@ -43,3 +43,4 @@ stages:
         orchestratorConnection: 'Azure-UIpath'
         packagesPath: 'C:\agent\_work\9\drop'
         folderName: 'Shared'
+        packageAction: 'Update'
