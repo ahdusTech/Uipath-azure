@@ -1,47 +1,53 @@
 trigger:
-- master
+  - master
+variables:
+  - group: UiPath
 
 stages:
-- stage: Build
-  displayName: Create build artifact
-  jobs:
-  - job: BuildArtifact
-    pool:
-      name: Azure-UIP
-    steps:
-    - task: UiPathPack@3
-      inputs:
-        versionType: 'AutoVersion'
-        projectJsonPath: '$(Build.SourcesDirectory)\project.json'
-        orchestratorConnection: 'Azure-UIpath'
-        outputPath: '$(Build.ArtifactStagingDirectory)\Output'
-    - task: PublishBuildArtifacts@1
-      inputs:
-        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-        ArtifactName: 'drop'
-        publishLocation: 'Container'
-    - task: UiPathDeploy@3
-      inputs:
-        orchestratorConnection: 'Azure-UIpath'
-        packagesPath: '$(Build.ArtifactStagingDirectory)\Output'
-        folderName: 'Shared'
-    - task: UiPathTest@3
-      inputs:
-        testTarget: 'TestProject'
-        orchestratorConnection: 'Azure-UIpath'
-        folderName: 'Shared'
-- stage: DevDeploy
-  displayName: 'Deploy to DEV Orchestrator'
-  dependsOn: Build
-  jobs:
-  - job: DevDeployJob
-    pool:
-      name: Azure-UIP
-    steps:
-    - task: UiPathDeploy@3
-      inputs:
-        orchestratorConnection: 'Azure-UIpath'
-        packageAction: 'Update'
-        packagesPath: 'C:\agent\_work\9\drop'
-        folderName: 'Shared'
-        #packageAction: 'Update'
+  - stage: Build
+    displayName: Build Package
+    jobs:
+    - job: BuildPackage
+      pool: Azure-UIP
+      steps:
+      - task: UiPathPack@3
+        inputs:
+          versionType: 'AutoVersion'
+          projectJsonPath: '$(Build.SourcesDirectory)\project.json'
+          outputType: 'Process'
+          orchestratorConnection: 'Azure-UIpath'
+          outputPath: '$(Build.ArtifactStagingDirectory)'
+      - publish: $(Build.ArtifactStagingDirectory)
+        artifact: drop
+
+  - stage: Assest
+    displayName: Create Assests
+    jobs:
+      - job: CreateAssests
+        pool: Azure-UIP
+        steps:
+        - task: UiPathAssets@3
+          inputs:
+            orchestratorConnection: 'Azure-UIpath'
+            folderName: 'Shared'
+            assetActionType: 'Deploy'
+            csvFile: '$(Build.SourcesDirectory)\Data\Assests.csv'
+
+  - stage: DeployDEV
+    displayName: Deploy build artifact to DEV
+    dependsOn: Build
+    condition: succeeded()
+    jobs:
+      - deployment: deployDEV
+        displayName: Deploy package to DEV Orchestrator
+        pool: Azure-UIP
+        environment: DEV
+        strategy:
+         runOnce:
+          deploy:
+           steps:
+            - task: UiPathDeploy@3
+              inputs:
+                orchestratorConnection: 'Azure-UIpath'
+                packagesPath: '$(Pipeline.Workspace)\drop'
+                folderName: 'Shared'
