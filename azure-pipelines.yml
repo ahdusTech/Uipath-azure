@@ -41,6 +41,7 @@ stages:
     - task: UiPathDeploy@3
       inputs:
         orchestratorConnection: 'Azure-UIpath'
+        packageAction: 'Replace'
         packagesPath: 'C:\agent\_work\9\drop'
         folderName: 'Shared'
         packageAction: 'Update'
