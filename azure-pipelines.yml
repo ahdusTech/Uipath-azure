@@ -7,27 +7,39 @@ stages:
   jobs:
   - job: BuildArtifact
     pool:
-      Azure-UIP
+      name: Azure-UIP
     steps:
     - task: UiPathPack@3
       inputs:
         versionType: 'AutoVersion'
-        projectJsonPath: '$(Build.SourcesDirectory)\project.json'
+        projectJsonPath: '$(Build.SourcesDirectory)/project.json'
         orchestratorConnection: 'Azure-UIpath'
-        outputPath: '$(Build.ArtifactStagingDirectory)\Output'
+        outputPath: '$(Build.ArtifactStagingDirectory)/Output'
     - task: PublishBuildArtifacts@1
       inputs:
         PathtoPublish: '$(Build.ArtifactStagingDirectory)'
         ArtifactName: 'drop'
         publishLocation: 'Container'
-    
     - task: UiPathDeploy@3
       inputs:
         orchestratorConnection: 'Azure-UIpath'
-        packagesPath: '$(Build.ArtifactStagingDirectory)\Output'
+        packagesPath: '$(Build.ArtifactStagingDirectory)/drop/Output'
         folderName: 'Shared'
     - task: UiPathTest@3
       inputs:
         testTarget: 'TestProject'
         orchestratorConnection: 'Azure-UIpath'
+        folderName: 'Shared'
+- stage: DevDeploy
+  displayName: 'Deploy to DEV Orchestrator'
+  dependsOn: Build
+  jobs:
+  - job: DevDeployJob
+    pool:
+      name: UiPath
+    steps:
+    - task: UiPathDeploy@3
+      inputs:
+        orchestratorConnection: 'Azure-UIpath'
+        packagesPath: '$(Build.ArtifactStagingDirectory)/drop/Output'
         folderName: 'Shared'
