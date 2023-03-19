@@ -44,4 +44,4 @@ stages:
         packageAction: 'Replace'
         packagesPath: 'C:\agent\_work\9\drop'
         folderName: 'Shared'
-        packageAction: 'Update'
+        #packageAction: 'Update'
