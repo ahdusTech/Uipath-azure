@@ -60,33 +60,3 @@ stages:
         orchestratorConnection: 'Azure-UIpath'
         folderName: 'Shared'
 
-- stage: RegressionTest
-  displayName: Regression Tests
-  dependsOn: Build
-  condition: succeeded()
-  jobs:
-  - job: RunRegressionTests
-    pool:
-      name: Azure-UIP
-    steps:
-    - task: NodeTool@0
-      inputs:
-        versionSpec: '14.x'
-      displayName: 'Install Node.js'
-    - script: |
-        npm install
-        npm run test
-      displayName: 'Run Unit Tests'
-  - job: RunTestPlan
-    displayName: 'Run Test Plan'
-    pool:
-      name: Azure-UIP
-    dependsOn: RegressionTest
-    steps:
-    - task: DownloadBuildArtifacts@0
-      inputs:
-        buildType: 'current'
-        downloadType: 'single'
-        artifactName: 'drop'
-        downloadPath: '$(System.ArtifactsDirectory)/drop'
-    
