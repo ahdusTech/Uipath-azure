@@ -56,18 +56,20 @@ stages:
         testTarget: 'TestProject'
         orchestratorConnection: 'Azure-UIpath'
         folderName: 'Shared'
-- stage: TestDEV
-  displayName:  Test After Publish
-  dependsOn: DeployDEV
+
+- stage: RegressionTest
+  displayName: Regression Tests
+  dependsOn: TestDEV
   condition: succeeded()
   jobs:
-      - job: TestDEV
-        pool: UiPath
-        steps:
-          - task: UiPathTest@3
-            inputs:
-              testTarget: 'TestSet'
-              orchestratorConnection: 'Azure-Uipath'
-              testSet: 'UiPathAzureDevOps_Tests'
-              folderName: 'Shared'
-            
+  - job: RunRegressionTests
+    pool: Azure-UIP
+    steps:
+    - task: AzureTestPlans@3
+      inputs:
+        azureSubscription: 'MyAzureSubscription'
+        testPlan: 'MyTestPlan'
+        testSuite: 'MyTestSuite'
+        configuration: 'DEV'
+        publishTestResults: true
+        testRunTitle: 'Regression Tests'
