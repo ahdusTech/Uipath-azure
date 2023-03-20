@@ -65,11 +65,11 @@ stages:
   - job: RunRegressionTests
     pool: Azure-UIP
     steps:
-    - task: AzureTestPlans@3
+    - task: NodeTool@0
       inputs:
-        azureSubscription: 'MyAzureSubscription'
-        testPlan: 'MyTestPlan'
-        testSuite: 'MyTestSuite'
-        configuration: 'DEV'
-        publishTestResults: true
-        testRunTitle: 'Regression Tests'
+        versionSpec: '14.x'
+      displayName: 'Install Node.js'
+    - script: |
+        npm install
+        npm run test
+      displayName: 'Run Unit Tests'
