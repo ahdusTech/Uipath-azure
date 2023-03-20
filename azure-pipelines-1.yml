@@ -2,22 +2,23 @@ trigger:
 - master
 
 variables:
-- group: UiPath
+  - group: UiPath
 
 stages:
 - stage: Build
   displayName: Build Package
   jobs:
   - job: BuildPackage
-    pool: Azure-UIP
+    pool:
+      name: Azure-UIP
     steps:
     - task: UiPathPack@3
       inputs:
         versionType: 'AutoVersion'
-        projectJsonPath: '$(Build.SourcesDirectory)\project.json'
+        projectJsonPath: '$(Build.SourcesDirectory)/project.json'
         outputType: 'Process'
         orchestratorConnection: 'Azure-Uipath'
-        outputPath: '$(Build.ArtifactStagingDirectory)\Output'
+        outputPath: '$(Build.ArtifactStagingDirectory)/Output'
     - task: PublishBuildArtifacts@1
       inputs:
         PathtoPublish: '$(Build.ArtifactStagingDirectory)'
@@ -26,22 +27,23 @@ stages:
     - task: UiPathDeploy@3
       inputs:
         orchestratorConnection: 'Azure-UIpath'
-        packagesPath: '$(Build.ArtifactStagingDirectory)\Output'
+        packagesPath: '$(Build.ArtifactStagingDirectory)/Output'
         folderName: 'Shared'
         environments: 'DEV'
-- stage: Assest
-  displayName: Create Assests
+        
+- stage: Asset
+  displayName: Create Assets
   jobs:
-  - job: CreateAssests
-    pool: Azure-UIP
+  - job: CreateAssets
+    pool:
+      name: Azure-UIP
     steps:
     - task: UiPathAssets@3
       inputs:
         orchestratorConnection: 'Azure-Uipath'
         folderName: 'Shared'
         assetActionType: 'Deploy'
-        csvFile: '$(Build.SourcesDirectory)\Data\Assets.csv'
-
+        csvFile: '$(Build.SourcesDirectory)/Data/Assets.csv'
 
 - stage: TestDEV
   displayName: Test After Publish
@@ -49,7 +51,8 @@ stages:
   condition: succeeded()
   jobs:
   - job: TestDEV
-    pool: Azure-UIP
+    pool:
+      name: Azure-UIP
     steps:
     - task: UiPathTest@3
       inputs:
@@ -63,7 +66,8 @@ stages:
   condition: succeeded()
   jobs:
   - job: RunRegressionTests
-    pool: Azure-UIP
+    pool:
+      name: Azure-UIP
     steps:
     - task: NodeTool@0
       inputs:
@@ -74,19 +78,20 @@ stages:
         npm run test
       displayName: 'Run Unit Tests'
   - job: RunTestPlan
-    displayName: 'Run Test Plain'
-    pool: Azure-UIP
+    displayName: 'Run Test Plan'
+    pool:
+      name: Azure-UIP
     dependsOn: BuildPackage
     steps:
     - task: DownloadBuildArtifacts@0
       inputs:
-       buildType: 'current'
-       downloadType: 'single'
-       artifactName: 'drop'
-       downloadPath: '$(System.ArtifactsDirectory)/drop'
+        buildType: 'current'
+        downloadType: 'single'
+        artifactName: 'drop'
+        downloadPath: '$(System.ArtifactsDirectory)/drop'
     - task: UiPathTestPlan@3
       inputs:
         orchestratorConnection: 'Azure-Uipath'
-      folderName: 'Shared'
-      testPlanPath: '$(System.ArtifactsDirectory)/drop/MyTestPlan.json'
-      testEnvironment: 'DEV'
+        folderName: 'Shared'
+        testPlanPath: '$(System.ArtifactsDirectory)/drop/MyTestPlan.json'
+        testEnvironment: 'DEV'
