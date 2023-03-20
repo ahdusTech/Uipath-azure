@@ -81,7 +81,7 @@ stages:
     displayName: 'Run Test Plan'
     pool:
       name: Azure-UIP
-    dependsOn: BuildPackage
+    dependsOn: TestDEV
     steps:
     - task: DownloadBuildArtifacts@0
       inputs:
