@@ -62,7 +62,7 @@ stages:
 
 - stage: RegressionTest
   displayName: Regression Tests
-  dependsOn: TestDEV
+  dependsOn: Build
   condition: succeeded()
   jobs:
   - job: RunRegressionTests
