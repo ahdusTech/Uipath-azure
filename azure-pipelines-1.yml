@@ -85,7 +85,7 @@ stages:
         testResultsFormat: 'JUnit'
         testResultsFiles: '**/TEST-*.xml'
       displayName: 'Publish Test Results'
-    - task: VisualStudioTestTaskV1@2
+    - task: VSTest@2
       inputs:
         testSelector: 'testPlan'
         testPlan: 'MyTestPlan'
