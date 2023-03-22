@@ -54,9 +54,8 @@ stages:
     pool:
       name: Azure-UIP
     steps:
-    - task: UiPathTest@3
+    - task: PublishTestResults@2
       inputs:
-        testTarget: 'TestProject'
-        orchestratorConnection: 'Azure-UIpath'
-        folderName: 'Shared'
+        testResultsFormat: 'JUnit'
+        testResultsFiles: '**/TEST-*.xml'
 
