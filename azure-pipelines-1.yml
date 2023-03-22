@@ -58,6 +58,8 @@ stages:
       inputs:
         testResultsFormat: 'JUnit'
         testResultsFiles: '**/TEST-*.xml'
+      displayName: 'Publish Test Results'
+      continueOnError: true
     - task: VSTest@2
       inputs:
         testSelector: 'testAssemblies'
@@ -66,3 +68,32 @@ stages:
           !**\*TestAdapter.dll
           !**\obj\**
         searchFolder: '$(System.DefaultWorkingDirectory)'
+      displayName: 'Run Unit Tests'
+      continueOnError: true
+      
+- stage: TestPlan
+  displayName: Run Test Plan
+  dependsOn: TestDEV
+  condition: succeeded()
+  jobs:
+  - job: RunTestPlan
+    pool:
+      name: Azure-UIP
+    steps:
+    - task: PublishTestResults@2
+      inputs:
+        testResultsFormat: 'JUnit'
+        testResultsFiles: '**/TEST-*.xml'
+      displayName: 'Publish Test Results'
+    - task: VisualStudioTestTaskV1@2
+      inputs:
+        testSelector: 'testPlan'
+        testPlan: 'MyTestPlan'
+        configuration: 'Release'
+        pathtoCustomTestAdapters: '$(Build.SourcesDirectory)/packages'
+        overrideTestrunParameters: '-TestEnv "DEV"'
+        testRunTitle: 'Test Run'
+        codeCoverageEnabled: true
+        runInParallel: true
+      displayName: 'Run Test Plan'
+      continueOnError: true
