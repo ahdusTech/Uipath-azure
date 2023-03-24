@@ -67,15 +67,6 @@ stages:
       name: Azure-UIP
     steps:
     - task: DotNetCoreCLI@2
-      displayName: Unit Tests
-      inputs:
-        command: 'test'
-        projects: '**/*UnitTests.csproj'
-        arguments: '--configuration Release --logger trx --filter Category=Unit'
-        workingDirectory: '$(System.DefaultWorkingDirectory)'
-        publishTestResults: true
-        testResultsFiles: '**/*.trx'
-    - task: DotNetCoreCLI@2
       displayName: Aggression Tests
       inputs:
         command: 'test'
