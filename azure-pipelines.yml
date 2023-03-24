@@ -31,7 +31,7 @@ stages:
             orchestratorConnection: 'zohan-lab'
             folderName: 'Shared'
             assetActionType: 'Deploy'
-            csvFile: '$(Build.SourcesDirectory)\Data\Assests.csv'
+            csvFile: '$(Build.SourcesDirectory)\Data\Assets.csv'
 
   - stage: DeployDEV
     displayName: Deploy build artifact to DEV
@@ -46,12 +46,22 @@ stages:
          runOnce:
           deploy:
            steps:
+            - task: UiPathPack@3
+              inputs:
+                versionType: 'AutoVersion'
+                projectJsonPath: '$(Build.SourcesDirectory)\project.json'
+                outputPath: '$(Build.ArtifactStagingDirectory)\Output'
+            - task: PublishBuildArtifacts@1
+              inputs:
+                PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+                ArtifactName: 'drop'
+                publishLocation: 'Container'
             - task: UiPathDeploy@3
               inputs:
-                orchestratorConnection: 'zohan-lab'
-                packagesPath: '$(Pipeline.Workspace)\drop'
-                folderName: 'Shared'
-          
+                 orchestratorConnection: 'zohan-lab'
+                 packagesPath: '$(Build.ArtifactStagingDirectory)\Output'
+                 folderName: 'Shared'
+                 environments: 'DEV'
 
 
   - stage: TestDEV
