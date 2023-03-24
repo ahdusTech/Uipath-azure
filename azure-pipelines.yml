@@ -8,14 +8,14 @@ stages:
     displayName: Build Package
     jobs:
     - job: BuildPackage
-      pool: Azure-UIP
+      pool: UiPath
       steps:
       - task: UiPathPack@3
         inputs:
           versionType: 'AutoVersion'
           projectJsonPath: '$(Build.SourcesDirectory)\project.json'
           outputType: 'Process'
-          orchestratorConnection: 'Azure-UIpath'
+          orchestratorConnection: 'zohan-lab'
           outputPath: '$(Build.ArtifactStagingDirectory)'
       - publish: $(Build.ArtifactStagingDirectory)
         artifact: drop
@@ -24,11 +24,11 @@ stages:
     displayName: Create Assests
     jobs:
       - job: CreateAssests
-        pool: Azure-UIP
+        pool: UiPath
         steps:
         - task: UiPathAssets@3
           inputs:
-            orchestratorConnection: 'Azure-UIpath'
+            orchestratorConnection: 'zohan-lab'
             folderName: 'Shared'
             assetActionType: 'Deploy'
             csvFile: '$(Build.SourcesDirectory)\Data\Assests.csv'
@@ -40,7 +40,7 @@ stages:
     jobs:
       - deployment: deployDEV
         displayName: Deploy package to DEV Orchestrator
-        pool: Azure-UIP
+        pool: UiPath
         environment: DEV
         strategy:
          runOnce:
@@ -48,6 +48,24 @@ stages:
            steps:
             - task: UiPathDeploy@3
               inputs:
-                orchestratorConnection: 'Azure-UIpath'
+                orchestratorConnection: 'UiPath DEV'
                 packagesPath: '$(Pipeline.Workspace)\drop'
                 folderName: 'Shared'
+          
+
+
+  - stage: TestDEV
+    displayName:  Test After Publish
+    dependsOn: DeployDEV
+    condition: succeeded()
+    jobs:
+      - job: TestDEV
+        pool: LAPTOP-Q338O4FK
+        steps:
+          - task: UiPathTest@3
+            inputs:
+              testTarget: 'TestSet'
+              orchestratorConnection: 'zohan-lab'
+              testSet: 'UiPath'
+              folderName: 'Shared'
+              testReportDestination: '$(Pipeline.Workspace)\drop'
