@@ -13,12 +13,9 @@ stages:
       - task: UiPathPack@3
         inputs:
           versionType: 'AutoVersion'
-          projectJsonPath: '$(Build.SourcesDirectory)\project.json'
-          outputType: 'Process'
+          projectJsonPath: '''$(Build.SourcesDirectory)\project.json'
           orchestratorConnection: 'zohan-lab'
-          outputPath: '$(Build.ArtifactStagingDirectory)'
-      - publish: $(Build.ArtifactStagingDirectory)
-        artifact: drop
+          outputPath: '$(Build.ArtifactStagingDirectory)\Output'
 
   - stage: Assest
     displayName: Create Assests
