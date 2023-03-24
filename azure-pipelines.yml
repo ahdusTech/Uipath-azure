@@ -48,7 +48,7 @@ stages:
            steps:
             - task: UiPathDeploy@3
               inputs:
-                orchestratorConnection: 'UiPath DEV'
+                orchestratorConnection: 'zohan-lab'
                 packagesPath: '$(Pipeline.Workspace)\drop'
                 folderName: 'Shared'
           
