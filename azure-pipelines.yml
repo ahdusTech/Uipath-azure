@@ -63,12 +63,11 @@ stages:
                  folderName: 'Shared'
                  environments: 'DEV'
 
-
-- stage: TestDEV
-  displayName: Test After Publish
-  dependsOn: DeployDEV
-  condition: succeeded()
-  jobs:
+  - stage: TestDEV
+    displayName: Test After Publish
+    dependsOn: DeployDEV
+    condition: succeeded()
+    jobs:
     - job: TestDEV
       pool: Azure-UIP
       steps:
