@@ -55,21 +55,7 @@ stages:
               ArtifactName: 'drop'
               publishLocation: 'Container'
 
-- stage: TestDEV
-  displayName: Test After Publish
-  dependsOn: DeployDEV
-  condition: succeeded()
-  jobs:
-  - job: TestDEV
-    pool: Azure-UIP
-    steps:
-    - task: UiPathTest@3
-      inputs:
-        testTarget: 'TestSet'
-        orchestratorConnection: 'zohan-lab'
-        testSet: 'UiPath'
-        folderName: 'Shared'
-        testReportDestination: '$(Pipeline.Workspace)\drop'
+
 
 - stage: TestDEV
   displayName: Test After Publish
