@@ -26,7 +26,7 @@ stages:
         publishLocation: 'Container'
     - task: UiPathDeploy@3
       inputs:
-        orchestratorConnection: 'Azure-UIpath'
+        orchestratorConnection: 'zohan-lab'
         packagesPath: '$(Build.ArtifactStagingDirectory)/Output'
         folderName: 'Shared'
         environments: 'DEV'
@@ -40,7 +40,7 @@ stages:
     steps:
     - task: UiPathAssets@3
       inputs:
-        orchestratorConnection: 'Azure-Uipath'
+        orchestratorConnection: 'zohan-lab'
         folderName: 'Shared'
         assetActionType: 'Deploy'
         csvFile: '$(Build.SourcesDirectory)/Data/Assets.csv'
