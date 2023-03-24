@@ -72,4 +72,8 @@ stages:
       continueOnError: true
       
 
-      
+    - task: UiPathTest@3
+      inputs:
+        testTarget: 'TestProject'
+        orchestratorConnection: 'zohan-lab'
+        folderName: 'Shared'
