@@ -69,7 +69,7 @@ stages:
     - task: UiPathTest@3
       inputs:
         testTarget: 'TestProject'
-        orchestratorConnection: 'Azure-UIpath'
+        orchestratorConnection: 'zohan-lab'
         folderName: 'Shared'
     - task: ApacheJMeter@1
     displayName: 'Aggression Test'
