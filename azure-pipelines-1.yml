@@ -70,4 +70,12 @@ stages:
         searchFolder: '$(System.DefaultWorkingDirectory)'
       displayName: 'Run Unit Tests'
       continueOnError: true
-      
+    - task: SonarCloudPublish@1
+      inputs:
+        pollingTimeoutSec: '300'
+    - task: TaurusRunner@0
+      inputs:
+        jmeterHome: '$(JMeterInstaller.JMeterHome)'
+        jmeterPath: '$(JMeterInstaller.JMeterPath)'
+        jmeterVersion: '$(JMeterInstaller.JMeterVersion)'
+        outputDir: 'taurus-output'
