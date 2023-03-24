@@ -63,15 +63,14 @@ stages:
   condition: succeeded()
   jobs:
   - job: TestDEV
-    pool:
-      name: Azure-UIP
+  pool:
+    name: Azure-UIP
     steps:
-    - task: DotNetCoreCLI@2
-      displayName: Aggression Tests
-      inputs:
-        command: 'test'
-        projects: '**/*AggressionTests.csproj'
-        arguments: '--configuration Release --logger trx --filter Category=Aggression'
-        workingDirectory: '$(System.DefaultWorkingDirectory)'
-        publishTestResults: true
-        testResultsFiles: '**/*.trx'
+    - task: ApacheJMeter@1
+    displayName: 'Aggression Test'
+    inputs:
+      testFiles: '**/*.csv, **/*.json, **/*.xml'  # Run on all CSV, JSON, and XML files in the repo
+      jmeterHome: '/path/to/jmeter'  # Set the path to your JMeter installation
+      propertiesJtl: 'results.jtl'  # Save results to a file named 'results.jtl'
+      propertiesOverride: '-Jusers=50 -Jrampup=10'  # Set parameters for the test
+
