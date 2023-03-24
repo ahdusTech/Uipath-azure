@@ -8,7 +8,7 @@ stages:
     displayName: Build Package
     jobs:
     - job: BuildPackage
-      pool: UiPath
+      pool: Azure-UIP
       steps:
       - task: UiPathPack@3
         inputs:
@@ -24,7 +24,7 @@ stages:
     displayName: Create Assests
     jobs:
       - job: CreateAssests
-        pool: UiPath
+        pool: Azure-UIP
         steps:
         - task: UiPathAssets@3
           inputs:
@@ -40,7 +40,7 @@ stages:
     jobs:
       - deployment: deployDEV
         displayName: Deploy package to DEV Orchestrator
-        pool: UiPath
+        pool: Azure-UIP
         environment: DEV
         strategy:
          runOnce:
@@ -60,7 +60,7 @@ stages:
     condition: succeeded()
     jobs:
       - job: TestDEV
-        pool: LAPTOP-Q338O4FK
+        pool: Azure-UIP
         steps:
           - task: UiPathTest@3
             inputs:
