@@ -64,7 +64,7 @@ stages:
                  environments: 'DEV'
 
 
- - stage: TestDEV
+- stage: TestDEV
   displayName: Test After Publish
   dependsOn: DeployDEV
   condition: succeeded()
