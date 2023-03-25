@@ -31,7 +31,7 @@ stages:
             orchestratorConnection: 'zohan-lab'
             folderName: 'Shared'
             assetActionType: 'Deploy'
-            csvFile: '$(Build.SourcesDirectory)\Data\Assests.csv'
+            csvFile: '$(Build.SourcesDirectory)\Data\Assets.csv'
 
   - stage: DeployDEV
     displayName: Deploy build artifact to DEV
@@ -66,7 +66,6 @@ stages:
         steps:
           - task: UiPathTest@3
             inputs:
-              testTarget: 'TestSet'
+              testTarget: 'TestProject'
               orchestratorConnection: 'zohan-lab'
-              testSet: 'UiPathAzureDevOps_Tests'
               folderName: 'Shared'
