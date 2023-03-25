@@ -62,7 +62,7 @@ stages:
     condition: succeeded()
     jobs:
       - job: TestDEV
-        pool: LAPTOP-Q338O4FK
+        pool: Azure-UIP
         steps:
           - task: UiPathTest@3
             inputs:
