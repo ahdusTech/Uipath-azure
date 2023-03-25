@@ -38,7 +38,7 @@ stages:
 
   - stage: TestDEV
     displayName:  Test After Publish
-    dependsOn: DeployDEV
+    dependsOn: Build
     condition: succeeded()
     jobs:
       - job: TestDEV
