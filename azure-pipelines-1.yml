@@ -14,38 +14,25 @@ stages:
         inputs:
           versionType: 'AutoVersion'
           projectJsonPath: '$(Build.SourcesDirectory)\project.json'
-          outputType: 'Process'
           orchestratorConnection: 'zohan-lab'
-          outputPath: '$(Build.ArtifactStagingDirectory)'
-      - publish: $(Build.ArtifactStagingDirectory)
-        artifact: drop
-
-  - stage: Assest
-    displayName: Create Assests
-    jobs:
-      - job: CreateAssests
-        pool: Azure-UIP
-        steps:
-        - task: UiPathAssets@3
-          inputs:
-            orchestratorConnection: 'zohan-lab'
-            folderName: 'Shared'
-            assetActionType: 'Deploy'
-            csvFile: '$(Build.SourcesDirectory)\Data\Assets.csv'
+          outputPath: '$(Build.ArtifactStagingDirectory)\Output'
+      - task: PublishBuildArtifacts@1
+        inputs:
+          PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+          ArtifactName: 'drop'
+          publishLocation: 'Container'
+      - task: UiPathDeploy@3
+        inputs:
+          orchestratorConnection: 'zohan-lab'
+          packagesPath: '$(Build.ArtifactStagingDirectory)\Output'
+          folderName: 'Shared'
+      - task: UiPathTest@3
+        inputs:
+          testTarget: 'TestProject'
+          orchestratorConnection: 'zohan-lab'
+          folderName: 'Shared'
   
           
 
 
-  - stage: TestDEV
-    displayName:  Test After Publish
-    dependsOn: Build
-    condition: succeeded()
-    jobs:
-      - job: TestDEV
-        pool: Azure-UIP
-        steps:
-          - task: UiPathTest@3
-            inputs:
-              testTarget: 'TestProject'
-              orchestratorConnection: 'zohan-lab'
-              folderName: 'Shared'
+  
