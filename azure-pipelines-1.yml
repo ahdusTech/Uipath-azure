@@ -26,11 +26,20 @@ stages:
           orchestratorConnection: 'zohan-lab'
           packagesPath: '$(Build.ArtifactStagingDirectory)\Output'
           folderName: 'Shared'
-      - task: UiPathTest@3
-        inputs:
-          testTarget: 'TestProject'
-          orchestratorConnection: 'zohan-lab'
-          folderName: 'Shared'
+  - stage: TestDEV
+    displayName:  Test After Publish
+    dependsOn: DeployDEV
+    condition: succeeded()
+    jobs:
+      - job: TestDEV
+        pool: LAPTOP-Q338O4FK
+        steps:
+          - task: UiPathTest@3
+            inputs:
+              testTarget: 'TestSet'
+              orchestratorConnection: 'UiPATH RPABOTSWORLD'
+              testSet: 'UiPathAzureDevOps_Tests'
+              folderName: 'Shared'
   
           
 
