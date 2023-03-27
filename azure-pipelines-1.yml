@@ -28,16 +28,16 @@ stages:
           folderName: 'Shared'
   - stage: TestDEV
     displayName:  Test After Publish
-    dependsOn: DeployDEV
+    dependsOn: Build
     condition: succeeded()
     jobs:
       - job: TestDEV
-        pool: LAPTOP-Q338O4FK
+        pool: Azure-UIP
         steps:
           - task: UiPathTest@3
             inputs:
               testTarget: 'TestSet'
-              orchestratorConnection: 'UiPATH RPABOTSWORLD'
+              orchestratorConnection: 'zohan-lab'
               testSet: 'UiPathAzureDevOps_Tests'
               folderName: 'Shared'
   
