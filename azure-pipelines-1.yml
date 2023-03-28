@@ -34,12 +34,51 @@ stages:
       - job: TestDEV
         pool: Azure-UIP
         steps:
-          - task: UiPathTest@3
-            inputs:
-              testTarget: 'TestSet'
-              orchestratorConnection: 'zohan-lab'
-              testSet: 'UiPathAzureDevOps_Tests'
-              folderName: 'Shared'
+        # Define a test suite
+- suite: Addition Tests
+  # Define a test case
+  - test_case: Test addition of two numbers
+    # Define the inputs
+    inputs:
+      - x: 2
+      - y: 3
+    # Define the expected output
+    expected_output: 5
+    # Define the test steps
+    steps:
+      - add x and y
+      - verify the result is equal to the expected output
+
+  # Define another test case
+  - test_case: Test addition of negative numbers
+    inputs:
+      - x: -2
+      - y: -3
+    expected_output: -5
+    steps:
+      - add x and y
+      - verify the result is equal to the expected output
+      
+  # Define a regression test case
+  - test_case: Test addition with decimal numbers
+    inputs:
+      - x: 1.5
+      - y: 2.5
+    expected_output: 4
+    steps:
+      - add x and y
+      - verify the result is equal to the expected output
+
+  # Define another regression test case
+  - test_case: Test addition with large numbers
+    inputs:
+      - x: 1000000000000000000000000
+      - y: 2000000000000000000000000
+    expected_output: 3000000000000000000000000
+    steps:
+      - add x and y
+      - verify the result is equal to the expected output
+          
   
           
 
