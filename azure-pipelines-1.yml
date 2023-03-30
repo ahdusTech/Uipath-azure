@@ -1,72 +1,71 @@
 trigger:
   - master
-
 variables:
-  - group: UiPath
+  - group: DEV
 
 stages:
   - stage: Build
     displayName: Build Package
     jobs:
-      - job: BuildPackage
-        pool:
-          name: Azure-UIP
+    - job: BuildPackage
+      pool: Azure-UIP
+      steps:
+      - task: UiPathPack@3
+        inputs:
+          versionType: 'AutoVersion'
+          projectJsonPath: '$(Build.SourcesDirectory)\project.json'
+          outputType: 'Process'
+          orchestratorConnection: 'zohan-lab'
+          outputPath: '$(Build.ArtifactStagingDirectory)'
+      - publish: $(Build.ArtifactStagingDirectory)
+        artifact: drop
+
+  - stage: Assest
+    displayName: Create Assests
+    jobs:
+      - job: CreateAssests
+        pool: Azure-UIP
         steps:
-          - task: UiPathPack@3
-            inputs:
-              versionType: 'AutoVersion'
-              projectJsonPath: '$(Build.SourcesDirectory)/project.json'
-              orchestratorConnection: 'zohan-lab'
-              outputPath: '$(Build.ArtifactStagingDirectory)/Output'
-          - task: PublishBuildArtifacts@1
-            inputs:
-              PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-              ArtifactName: 'drop'
-              publishLocation: 'Container'
-          - task: UiPathDeploy@3
-            inputs:
-              orchestratorConnection: 'zohan-lab'
-              packagesPath: '$(Build.ArtifactStagingDirectory)/Output'
-              folderName: 'Shared'
-  - stage: TestDEV
-    displayName: Test After Publish
+        - task: UiPathAssets@3
+          inputs:
+            orchestratorConnection: 'zohan-lab'
+            folderName: 'Shared'
+            assetActionType: 'Deploy'
+            csvFile: '$(Build.SourcesDirectory)\Data\Assests.csv'
+
+  - stage: DeployDEV
+    displayName: Deploy build artifact to DEV
     dependsOn: Build
     condition: succeeded()
     jobs:
+      - deployment: deployDEV
+        displayName: Deploy package to DEV Orchestrator
+        pool: Azure-UIP
+        environment: DEV
+        strategy:
+         runOnce:
+          deploy:
+           steps:
+            - task: UiPathDeploy@3
+              inputs:
+                orchestratorConnection: 'zohan-lab'
+                packagesPath: '$(Pipeline.Workspace)\drop'
+                folderName: 'Shared'
+
+ 
+
+  - stage: TestDEV
+    displayName:  Test After Publish
+    dependsOn: DeployDEV
+    condition: succeeded()
+    jobs:
       - job: TestDEV
-        pool:
-          name: Azure-UIP
-          steps:
-          - suite: Addition Tests
-          - test_case: Test addition of two numbers
+        pool: Azure-UIP
+        steps:
+          - task: UiPathTest@3
             inputs:
-              - x: 2
-              - y: 3
-            expected_output: 5
-            steps:
-              - add x and y
-              - verify the result is equal to the expected output
-          - test_case: Test addition of negative numbers
-            inputs:
-              - x: -2
-              - y: -3
-            expected_output: -5
-            steps:
-              - add x and y
-              - verify the result is equal to the expected output
-          - test_case: Test addition with decimal numbers
-            inputs:
-              - x: 1.5
-              - y: 2.5
-            expected_output: 4
-            steps:
-              - add x and y
-              - verify the result is equal to the expected output
-          - test_case: Test addition with large numbers
-            inputs:
-              - x: 1000000000000000000000000
-              - y: 2000000000000000000000000
-            expected_output: 3000000000000000000000000
-            steps:
-              - add x and y
-              - verify the result is equal to the expected output
+              testTarget: 'TestSet'
+              orchestratorConnection: 'zohan-lab'
+              testSet: 'UiPathAzureDevOps_Tests'
+              folderName: 'Shared'
+              testReportDestination: '$(Pipeline.Workspace)\drop'
