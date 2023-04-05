@@ -34,12 +34,11 @@ stages:
         PathtoPublish: '$(Build.ArtifactStagingDirectory)Output'
         ArtifactName: 'drop'
         publishLocation: 'Container'
-    - task: Approval@1
-      displayName: 'Waiting for DEV Approval'
-      inputs:
-        approver: 'user@company.com'
-        timeoutInMinutes: 1440 # 24 hours
-      continueOnError: true # To continue with the deployment even if approval is not received
+   # - task: ManualIntervention@1
+    #  displayName: 'Waiting for DEV Approval'
+     # inputs:
+      #  instructions: 'Please approve or reject the deployment to DEV environment.'
+       # timeoutInMinutes: 1440 # 24 hours
 
 - stage: Asset
   displayName: Create Assets
@@ -71,12 +70,11 @@ stages:
         npm install
         npm run test
       displayName: 'Run Unit Tests'
-    - task: Approval@1
-      displayName: 'Waiting for TST Approval'
-      inputs:
-        approver: 'user@company.com'
-        timeoutInMinutes: 1440 # 24 hours
-      continueOnError: true # To continue with the deployment even if approval is not received
+   # - task: ManualIntervention@
+    #  displayName: 'Waiting for TST Approval'
+     # inputs:
+      #  instructions: 'Please approve or reject the deployment to TST environment.'
+       # timeoutInMinutes: 1440 # 24 hours
 
 - stage: PrdDeploy
   displayName: 'Deploy to PRD Orchestrator'
@@ -96,3 +94,7 @@ stages:
         orchestratorConnection: 'zohan-lab'
         packagesPath: '$(Pipeline.Workspace)\drop'
         folderName: Shared
+   #- task: ManualIntervention@1
+   #   displayName: 'Waiting for PRD Approval'
+    #  inputs:
+     #   instructions: 'Please approve or reject the deployment to PR'
