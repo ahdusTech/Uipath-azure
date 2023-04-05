@@ -1,0 +1,103 @@
+trigger:
+- main
+
+variables:
+  group: UiPath
+  devOrchestrator: 'https://dev.uipath.com/'
+  tstOrchestrator: 'https://tst.uipath.com/'
+  prdOrchestrator: 'https://prd.uipath.com/'
+
+stages:
+- stage: Build
+  displayName: Build Package
+  jobs:
+  - job: BuildPackage
+    pool: Azure-UIP
+    steps:
+    - task: UiPathPack@3
+      inputs:
+        versionType: 'AutoVersion'
+        projectJsonPath: '$(Build.SourcesDirectory)/process/XXX-test-load/project.json'
+        outputType: 'Process'
+        orchestratorConnection: 'zohan-lab'
+        outputPath: '$(Build.ArtifactStagingDirectory)Output'
+
+- stage: DEV
+  displayName: 'Publish DEV artifact'
+  jobs:
+  - job: DEVArtifact
+    pool:
+      name: Azure-UIP
+    steps:
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)Output'
+        ArtifactName: 'drop'
+        publishLocation: 'Container'
+    - task: Approval@1
+      displayName: 'Waiting for DEV Approval'
+      inputs:
+        approver: 'user@company.com'
+        timeoutInMinutes: 1440 # 24 hours
+      continueOnError: true # To continue with the deployment even if approval is not received
+
+- stage: Asset
+  displayName: Create Assets
+  jobs:
+    - job: CreateAssets
+      pool: Azure-UIP
+      steps:
+        - task: UiPathAssets@3
+          inputs:
+            orchestratorConnection: 'zohan-lab'
+            folderName: 'Shared'
+            assetActionType: 'Deploy'
+            csvFile: '$(Build.SourcesDirectory)/process/Assets/Assets.csv'
+
+- stage: TstDeploy
+  displayName: 'Deploy to TST Orchestrator'
+  dependsOn: DEV
+  condition: succeeded()
+  jobs:
+  - job: TstDeployJob
+    pool:
+      name: Azure-UIP
+    steps:
+    - task: NodeTool@0
+      inputs:
+        versionSpec: '14.x'
+      displayName: 'Install Node.js'
+    - script: |
+        npm install
+        npm run test
+      displayName: 'Run Unit Tests'
+    - task: Approval@1
+      displayName: 'Waiting for TST Approval'
+      inputs:
+        approver: 'user@company.com'
+        timeoutInMinutes: 1440 # 24 hours
+      continueOnError: true # To continue with the deployment even if approval is not received
+
+- stage: PrdDeploy
+  displayName: 'Deploy to PRD Orchestrator'
+  dependsOn: TstDeploy
+  condition: succeeded()
+  jobs:
+  - job: DeployToTestJob
+    pool:  # Update this if using dedicated build pool
+      name:  'Azure-UIP'
+    workspace:
+      clean: all
+    steps:
+    - download: current
+      artifact: drop
+    - task: UiPathDeploy@3
+      inputs:
+        orchestratorConnection: 'zohan-lab'
+        packagesPath: '$(Pipeline.Workspace)\drop'
+        folderName: Shared
+    - task: Approval@1
+      displayName: 'Waiting for PRD Approval'
+      inputs:
+        approver: 'user@company.com'
+        timeoutIn
