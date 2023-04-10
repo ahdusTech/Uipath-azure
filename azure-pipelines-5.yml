@@ -53,7 +53,7 @@ stages:
             assetActionType: 'Deploy'
             csvFile: '$(Build.SourcesDirectory)/Data/Assets.csv'
       
-- stage: PrdDeploy
+- stage: TSTDeploy
   displayName: Deploy build artifact to DEV
   dependsOn: Build
   jobs:
@@ -73,29 +73,27 @@ stages:
                 npm install
                 npm run test
                 displayName: 'Run Unit Tests'
-- stage: PrdDeploy
-  displayName: 'Deploy to PRD Orchestrator'
-  dependsOn: TstDeploy
-  condition: succeeded()
+- stage: TSTDeploy
+  displayName: Deploy build artifact to DEV
+  dependsOn: Build
   jobs:
-  - job: DeployToTestJob
-    pool:
-      name: Azure-UIP
-      
-      environment: PRD_approval_required
-      strategy:    
-          runOnce:
-            deploy:
-    workspace:
-      clean: all
+      - deployment: deployDEV
+        displayName: Deploy package to DEV Orchestrator
+        pool: Azure-UIP
+        environment: DEV_no_approval112
+        strategy:
+         runOnce:
+          deploy:
+        workspace:
+         clean: all
      
-    steps:
-    - download: current
-      artifact: drop
-    - task: UiPathDeploy@3
-      inputs:
-        orchestratorConnection: 'zohan-lab'
-        packagesPath: '$(Pipeline.Workspace)\drop'
-        folderName: Shared
+        steps:
+        - download: current
+          artifact: drop
+        - task: UiPathDeploy@3
+          inputs:
+          orchestratorConnection: 'zohan-lab'
+          packagesPath: '$(Pipeline.Workspace)\drop'
+          folderName: Shared
 
 
