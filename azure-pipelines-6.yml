@@ -84,14 +84,14 @@ stages:
     displayName: deploy Web App
     pool:
       name: Azure-UIP
-      workspace:
-      clean: all
+    workspace:
+      clean: all 
     # creates an environment if it doesn't exist
     environment: 'smarthotel-dev1'
     strategy:
       runOnce:
         deploy:
-        
+
           steps:
           - download: current
             artifact: drop
