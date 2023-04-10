@@ -1,82 +1,105 @@
 trigger:
-- master
+- main
 
 variables:
-- group: UiPath
+  group: UiPath
+  devOrchestrator: 'https://dev.uipath.com/'
+  tstOrchestrator: 'https://tst.uipath.com/'
+  prdOrchestrator: 'https://prd.uipath.com/'
 
 stages:
 - stage: Build
   displayName: Build Package
   jobs:
   - job: BuildPackage
-    pool: Azure-UIP
+    pool: UiPath
     steps:
     - task: UiPathPack@3
       inputs:
         versionType: 'AutoVersion'
-        projectJsonPath: '$(Build.SourcesDirectory)\project.json'
+        projectJsonPath: '$(Build.SourcesDirectory)/project.json'
+        outputType: 'Process'
         orchestratorConnection: 'zohan-lab'
-        outputPath: '$(Build.ArtifactStagingDirectory)\Output'
+        outputPath: '$(Build.ArtifactStagingDirectory)Output'
 
-- stage: Assest
-  displayName: Create Assests
-  jobs:
-  - job: CreateAssests
-    pool: Azure-UIP
-    steps:
-    - task: UiPathAssets@3
-      inputs:
-        orchestratorConnection: 'zohan-lab'
-        folderName: 'Shared'
-        assetActionType: 'Deploy'
-        csvFile: '$(Build.SourcesDirectory)\Data\Assets.csv'
-
-- stage: DeployDEV
+- stage: DEV
   displayName: Deploy build artifact to DEV
   dependsOn: Build
-  condition: succeeded()
   jobs:
-  - deployment: deployDEV
-    displayName: Deploy package to DEV Orchestrator
-    pool: Azure-UIP
-    environment: DEV
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - task: UiPathPack@3
-            inputs:
-              versionType: 'AutoVersion'
-              projectJsonPath: '$(Build.SourcesDirectory)\project.json'
-              outputPath: '$(Build.ArtifactStagingDirectory)\Output'
-          - task: PublishBuildArtifacts@1
-            inputs:
-              PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+      - deployment: deployDEV
+        displayName: Deploy package to DEV Orchestrator
+        pool: UiPath
+        environment: DEV_no_approvals
+        strategy:
+         runOnce:
+          deploy:
+           steps:
+           - task: PublishBuildArtifacts@1
+             inputs:
+              PathtoPublish: '$(Build.ArtifactStagingDirectory)Output'
               ArtifactName: 'drop'
               publishLocation: 'Container'
 
-
-
-- stage: TestDEV
-  displayName: Test After Publish
-  dependsOn: Build
+- stage: Asset
+  displayName: Create Assets
+  jobs:
+    - job: CreateAssets
+      pool: UiPath
+      steps:
+        - task: UiPathAssets@3
+          inputs:
+            orchestratorConnection: 'zohan-lab'
+            folderName: 'Shared'
+            assetActionType: 'Deploy'
+            csvFile: '$(Build.SourcesDirectory)/Data/Assets.csv'
+      
+- stage: TstDeploy
+  displayName: Deploy  artifact to TST
+  dependsOn: DEV
+  jobs:
+      - deployment: deployDEV
+        displayName: Deploy package to DEV Orchestrator
+        pool: UiPath
+        environment: TST_approval_required
+        strategy:
+         runOnce:
+          deploy:
+             steps:
+             - task: NodeTool@0
+               inputs:
+                versionSpec: '14.x'
+               displayName: 'Install Node.js'
+             - script: |
+                npm install
+                npm run test
+                displayName: 'Run Unit Tests'
+- stage: PrdDeploy
+  displayName: 'Deploy to PRD Orchestrator'
+  dependsOn: TstDeploy
   condition: succeeded()
   jobs:
-  - job: TestDEV
-  pool:
-    name: Azure-UIP
+  - job: DeployToTestJob
+    pool:
+      name: 'UiPath'
+      environment: PRD_approval_required
+      strategy:
+        runOnce:
+          deploy:
+          preDeploy:
+          - approval: 'PRD Approval'
+            reason: 'Approval required for PRD deployment'
+            timeoutInMinutes: 1440
+            contCondition: 'succeeded()'
+            deployStep: 'true'
+    workspace:
+      clean: all
     steps:
-    - task: UiPathTest@3
+    - download: current
+      artifact: drop
+    - task: UiPathDeploy@3
       inputs:
-        testTarget: 'TestProject'
         orchestratorConnection: 'zohan-lab'
-        folderName: 'Shared'
-    - task: ApacheJMeter@1
-    displayName: 'Aggression Test'
-    inputs:
-      testFiles: '**/*.csv, **/*.json, **/*.xml'  # Run on all CSV, JSON, and XML files in the repo
-      jmeterHome: '/path/to/jmeter'  # Set the path to your JMeter installation
-      propertiesJtl: 'results.jtl'  # Save results to a file named 'results.jtl'
-      propertiesOverride: '-Jusers=50 -Jrampup=10'  # Set parameters for the test
-    
+        packagesPath: '$(Pipeline.Workspace)\drop'
+        folderName: Shared
+
 
