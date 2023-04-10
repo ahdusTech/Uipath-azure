@@ -82,8 +82,8 @@ stages:
     pool:
       name: Azure-UIP
       environment:
-       name: PRD_approval_required
-      strategy:
+       name: 'PRD_approval_required'
+       strategy:
           runOnce:
           deploy:
     workspace:
