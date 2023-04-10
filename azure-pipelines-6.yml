@@ -78,25 +78,27 @@ stages:
               npm run test
             displayName: 'Run Unit Tests'
 
-- stage: PRD
+- stage: PrdDeploy
+  displayName: 'Deploy to PRD Orchestrator'
+  dependsOn: TstDeploy
+  condition: succeeded()
   jobs:
-  - deployment: DeployToPrd
-    displayName: deploy Web App
+  - job: DeployToTestJob
     pool:
       name: Azure-UIP
+      
+      environment: production
+      strategy:    
+          runOnce:
+            deploy:
     workspace:
-      clean: all 
-    # creates an environment if it doesn't exist
-    environment: 'smarthotel-dev1'
-    strategy:
-      runOnce:
-        deploy:
-
-          steps:
-          - download: current
-            artifact: drop
-          - task: UiPathDeploy@3
-            inputs:
-             orchestratorConnection: 'zohan-lab'
-             packagesPath: '$(Pipeline.Workspace)\drop'
-             folderName: Shared
+      clean: all
+     
+    steps:
+    - download: current
+      artifact: drop
+    - task: UiPathDeploy@3
+      inputs:
+        orchestratorConnection: 'zohan-lab'
+        packagesPath: '$(Pipeline.Workspace)\drop'
+        folderName: Shared
