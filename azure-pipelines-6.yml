@@ -18,7 +18,7 @@ stages:
     - task: UiPathPack@3
       inputs:
         versionType: 'AutoVersion'
-        projectJsonPath: '$(Build.SourcesDirectory)/process/XXX-test-load/project.json'
+        projectJsonPath: '$(Build.SourcesDirectory)/project.json'
         outputType: 'Process'
         orchestratorConnection: 'zohan-lab'
         outputPath: '$(Build.ArtifactStagingDirectory)Output'
@@ -54,7 +54,7 @@ stages:
         orchestratorConnection: 'zohan-lab'
         folderName: 'Shared'
         assetActionType: 'Deploy'
-        csvFile: '$(Build.SourcesDirectory)/process/Assets/Assets.csv'
+        csvFile: '$(Build.SourcesDirectory)/Data/Assets.csv'
 
 - stage: TstDeploy
   displayName: Deploy artifact to TST
