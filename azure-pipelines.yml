@@ -12,7 +12,7 @@ stages:
   displayName: Build Package
   jobs:
   - job: BuildPackage
-    pool: UiPath
+    pool: Azure-UIP
     steps:
     - task: UiPathPack@3
       inputs:
@@ -44,7 +44,7 @@ stages:
   displayName: Create Assets
   jobs:
     - job: CreateAssets
-      pool: UiPath
+      pool: Azure-UIP
       steps:
         - task: UiPathAssets@3
           inputs:
@@ -59,7 +59,7 @@ stages:
   jobs:
       - deployment: deployDEV
         displayName: Deploy package to DEV Orchestrator
-        pool: UiPath
+        pool: Azure-UIP
         environment: TST_approval_required
         strategy:
          runOnce:
@@ -80,7 +80,7 @@ stages:
   jobs:
   - job: DeployToTestJob
     pool:
-      name: 'UiPath'
+      name: Azure-UIP
       environment: PRD_approval_required
       strategy:
         runOnce:
