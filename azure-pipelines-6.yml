@@ -83,7 +83,7 @@ stages:
   - deployment: DeployWeb
     displayName: deploy Web App
     pool:
-      vmImage: Azure-UIP
+      name: Azure-UIP
     # creates an environment if it doesn't exist
     environment: 'smarthotel-dev'
     strategy:
