@@ -81,16 +81,6 @@ stages:
   - job: DeployToTestJob
     pool:
       name: Azure-UIP
-      environment: PRD_approval_required
-      strategy:
-        runOnce:
-          deploy:
-          preDeploy:
-          - approval: 'PRD Approval'
-            reason: 'Approval required for PRD deployment'
-            timeoutInMinutes: 1440
-            contCondition: 'succeeded()'
-            deployStep: 'true'
     workspace:
       clean: all
     steps:
