@@ -1,0 +1,101 @@
+trigger:
+- main
+
+variables:
+  group: UiPath
+  devOrchestrator: 'https://dev.uipath.com/'
+  tstOrchestrator: 'https://tst.uipath.com/'
+  prdOrchestrator: 'https://prd.uipath.com/'
+
+stages:
+- stage: Build
+  displayName: Build Package
+  jobs:
+  - job: BuildPackage
+    pool: Azure-UIP
+    steps:
+    - task: UiPathPack@3
+      inputs:
+        versionType: 'AutoVersion'
+        projectJsonPath: '$(Build.SourcesDirectory)/project.json'
+        outputType: 'Process'
+        orchestratorConnection: 'zohan-lab'
+        outputPath: '$(Build.ArtifactStagingDirectory)Output'
+
+- stage: DEV
+  displayName: Deploy build artifact to DEV
+  dependsOn: Build
+  jobs:
+      - deployment: deployDEV
+        displayName: Deploy package to DEV Orchestrator
+        pool: Azure-UIP
+        environment: PRD_approval_required
+        strategy:
+         runOnce:
+          deploy:
+           steps:
+           - task: PublishBuildArtifacts@1
+             inputs:
+              PathtoPublish: '$(Build.ArtifactStagingDirectory)Output'
+              ArtifactName: 'drop'
+              publishLocation: 'Container'
+
+- stage: Asset
+  displayName: Create Assets
+  jobs:
+    - job: CreateAssets
+      pool: Azure-UIP
+      steps:
+        - task: UiPathAssets@3
+          inputs:
+            orchestratorConnection: 'zohan-lab'
+            folderName: 'Shared'
+            assetActionType: 'Deploy'
+            csvFile: '$(Build.SourcesDirectory)/Data/Assets.csv'
+      
+- stage: TstDeploy
+  displayName: Deploy  artifact to TST
+  dependsOn: DEV
+  jobs:
+      - deployment: deployDEV
+        displayName: Deploy package to DEV Orchestrator
+        pool: Azure-UIP
+        environment: TST_approval_required
+        strategy:
+         runOnce:
+          deploy:
+             steps:
+             - task: NodeTool@0
+               inputs:
+                versionSpec: '14.x'
+               displayName: 'Install Node.js'
+             - script: |
+                npm install
+                npm run test
+                displayName: 'Run Unit Tests'
+- stage: PrdDeploy
+  displayName: 'Deploy to PRD Orchestrator'
+  dependsOn: TstDeploy
+  condition: succeeded()
+  jobs:
+  - job: DeployToTestJob
+    pool:
+      name: Azure-UIP
+      
+      environment: production
+      strategy:    
+          runOnce:
+            deploy:
+    workspace:
+      clean: all
+     
+    steps:
+    - download: current
+      artifact: drop
+    - task: UiPathDeploy@3
+      inputs:
+        orchestratorConnection: 'zohan-lab'
+        packagesPath: '$(Pipeline.Workspace)\drop'
+        folderName: Shared
+
+
