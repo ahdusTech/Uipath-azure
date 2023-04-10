@@ -78,16 +78,23 @@ stages:
               npm run test
             displayName: 'Run Unit Tests'
 
-- stage: deploy
+- stage: PRD
   jobs:
-  - deployment: DeployWeb
+  - deployment: DeployToPrd
     displayName: deploy Web App
     pool:
       name: Azure-UIP
     # creates an environment if it doesn't exist
-    environment: 'smarthotel-dev'
+    environment: 'smarthotel-dev1'
     strategy:
       runOnce:
         deploy:
+        
           steps:
-          - script: echo Hello world
+          - download: current
+            artifact: drop
+          - task: UiPathDeploy@3
+            inputs:
+             orchestratorConnection: 'Azure-Devops-integration'
+             packagesPath: '$(Pipeline.Workspace)\drop'
+             folderName: Shared
