@@ -13,7 +13,7 @@ stages:
   jobs:
   - job: BuildPackage
     pool:
-      name: UiPath
+      name: Azure-UIP
     steps:
     - task: UiPathPack@3
       inputs:
@@ -30,7 +30,7 @@ stages:
   - deployment: deployDEV
     displayName: Deploy package to DEV Orchestrator
     pool:
-      name: UiPath
+      name: Azure-UIP
     environment: DEV_no_approvals
     strategy:
       runOnce:
@@ -47,7 +47,7 @@ stages:
   jobs:
   - job: CreateAssets
     pool:
-      name: UiPath
+      name: Azure-UIP
     steps:
     - task: UiPathAssets@3
       inputs:
@@ -63,7 +63,7 @@ stages:
   - deployment: deployTST
     displayName: Deploy package to TST Orchestrator
     pool:
-      name: UiPath
+      name: Azure-UIP
     environment: TST_approval_required
     strategy:
       runOnce:
@@ -83,7 +83,7 @@ stages:
   - deployment: DeployWeb
     displayName: deploy Web App
     pool:
-      vmImage: 'UiPath'
+      vmImage: Azure-UIP
     # creates an environment if it doesn't exist
     environment: 'smarthotel-dev'
     strategy:
