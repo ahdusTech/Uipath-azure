@@ -51,7 +51,7 @@ stages:
     steps:
     - task: UiPathAssets@3
       inputs:
-        orchestratorConnection: 'Azure-Devops-integration'
+        orchestratorConnection: 'zohan-lab'
         folderName: 'Shared'
         assetActionType: 'Deploy'
         csvFile: '$(Build.SourcesDirectory)/process/Assets/Assets.csv'
