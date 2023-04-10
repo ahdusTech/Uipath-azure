@@ -81,9 +81,9 @@ stages:
   - job: DeployToTestJob
     pool:
       name: Azure-UIP
-      environment:
-       name: 'PRD_approval_required'
-       strategy:
+      
+      environment: 'PRD_approval_required'
+      strategy:
           runOnce:
           deploy:
     workspace:
