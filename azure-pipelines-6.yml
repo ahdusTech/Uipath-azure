@@ -1,0 +1,93 @@
+trigger:
+- main
+
+variables:
+  group: UiPath
+  devOrchestrator: 'https://dev.uipath.com/'
+  tstOrchestrator: 'https://tst.uipath.com/'
+  prdOrchestrator: 'https://prd.uipath.com/'
+
+stages:
+- stage: Build
+  displayName: Build Package
+  jobs:
+  - job: BuildPackage
+    pool:
+      name: UiPath
+    steps:
+    - task: UiPathPack@3
+      inputs:
+        versionType: 'AutoVersion'
+        projectJsonPath: '$(Build.SourcesDirectory)/process/XXX-test-load/project.json'
+        outputType: 'Process'
+        orchestratorConnection: 'Azure-Devops-integration'
+        outputPath: '$(Build.ArtifactStagingDirectory)Output'
+
+- stage: DEV
+  displayName: Deploy build artifact to DEV
+  dependsOn: Build
+  jobs:
+  - deployment: deployDEV
+    displayName: Deploy package to DEV Orchestrator
+    pool:
+      name: UiPath
+    environment: DEV_no_approvals
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: PublishBuildArtifacts@1
+            inputs:
+              PathtoPublish: '$(Build.ArtifactStagingDirectory)Output'
+              ArtifactName: 'drop'
+              publishLocation: 'Container'
+
+- stage: Asset
+  displayName: Create Assets
+  jobs:
+  - job: CreateAssets
+    pool:
+      name: UiPath
+    steps:
+    - task: UiPathAssets@3
+      inputs:
+        orchestratorConnection: 'Azure-Devops-integration'
+        folderName: 'Shared'
+        assetActionType: 'Deploy'
+        csvFile: '$(Build.SourcesDirectory)/process/Assets/Assets.csv'
+
+- stage: TstDeploy
+  displayName: Deploy artifact to TST
+  dependsOn: DEV
+  jobs:
+  - deployment: deployTST
+    displayName: Deploy package to TST Orchestrator
+    pool:
+      name: UiPath
+    environment: TST_approval_required
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: NodeTool@0
+            inputs:
+              versionSpec: '14.x'
+            displayName: 'Install Node.js'
+          - script: |
+              npm install
+              npm run test
+            displayName: 'Run Unit Tests'
+
+- stage: deploy
+  jobs:
+  - deployment: DeployWeb
+    displayName: deploy Web App
+    pool:
+      vmImage: 'UiPath'
+    # creates an environment if it doesn't exist
+    environment: 'smarthotel-dev'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - script: echo Hello world
