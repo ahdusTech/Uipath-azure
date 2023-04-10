@@ -86,11 +86,11 @@ stages:
   - job: DeployToTestJob
     pool:
       name: Azure-UIP
-      
       environment: production
       strategy:    
           runOnce:
             deploy:
+  - job: clearWorkspace
     workspace:
       clean: all
      
