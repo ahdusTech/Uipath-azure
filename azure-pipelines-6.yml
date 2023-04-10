@@ -20,7 +20,7 @@ stages:
         versionType: 'AutoVersion'
         projectJsonPath: '$(Build.SourcesDirectory)/process/XXX-test-load/project.json'
         outputType: 'Process'
-        orchestratorConnection: 'Azure-Devops-integration'
+        orchestratorConnection: 'zohan-lab'
         outputPath: '$(Build.ArtifactStagingDirectory)Output'
 
 - stage: DEV
