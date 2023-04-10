@@ -95,6 +95,6 @@ stages:
             artifact: drop
           - task: UiPathDeploy@3
             inputs:
-             orchestratorConnection: 'Azure-Devops-integration'
+             orchestratorConnection: 'zohan-lab'
              packagesPath: '$(Pipeline.Workspace)\drop'
              folderName: Shared
