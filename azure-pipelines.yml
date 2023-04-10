@@ -29,7 +29,7 @@ stages:
       - deployment: deployDEV
         displayName: Deploy package to DEV Orchestrator
         pool: Azure-UIP
-        environment: DEV_no_approval
+        environment: DEV_no_approval1
         strategy:
          runOnce:
           deploy:
