@@ -14,6 +14,8 @@ stages:
   - job: BuildPackage
     pool:
       name: Azure-UIP
+    workspace:
+      clean: all
     steps:
     - task: UiPathPack@3
       inputs:
@@ -90,9 +92,6 @@ stages:
       strategy:    
           runOnce:
             deploy:
-  - job: clearWorkspace
-    workspace:
-      clean: all
      
     steps:
     - download: current
