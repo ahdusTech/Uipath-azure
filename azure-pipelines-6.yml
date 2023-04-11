@@ -102,3 +102,16 @@ stages:
         orchestratorConnection: 'zohan-lab'
         packagesPath: '$(Pipeline.Workspace)\drop'
         folderName: Shared
+- stage: deploy-Server
+  jobs:
+  - deployment: DeployWeb
+    displayName: deploy Web App
+    pool:
+      name: Azure-UIP
+    # creates an environment if it doesn't exist
+    environment: 'smarthotel-dev'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - script: echo Hello world
