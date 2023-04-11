@@ -88,10 +88,11 @@ stages:
   - job: DeployToTestJob
     pool:
       name: Azure-UIP
-      environment: production
-      strategy:    
-          runOnce:
-            deploy:
+      environment: 'smarthotel-Production'
+      strategy:
+        runOnce:
+        deploy:
+          steps:
      
     steps:
     - download: current
