@@ -85,8 +85,6 @@ stages:
   jobs:
   - deployment: DeployPRD
     displayName: deploy Web App
-    dependsOn: TstDeploy
-    condition: succeeded()
     pool:
       name: Azure-UIP
     # creates an environment if it doesn't exist
