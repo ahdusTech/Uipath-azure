@@ -80,28 +80,7 @@ stages:
               npm run test
             displayName: 'Run Unit Tests'
 
-- stage: PrdDeploy
-  displayName: 'Deploy to PRD Orchestrator'
-  dependsOn: TstDeploy
-  condition: succeeded()
-  jobs:
-  - job: DeployToTestJob
-    pool:
-      name: Azure-UIP
-      environment: smarthotel-Production
-      strategy:
-        runOnce:
-        deploy:
-          steps:
-     
-    steps:
-    - download: current
-      artifact: drop
-    - task: UiPathDeploy@3
-      inputs:
-        orchestratorConnection: 'zohan-lab'
-        packagesPath: '$(Pipeline.Workspace)\drop'
-        folderName: Shared
+
 - stage: deploy_Server
   jobs:
   - deployment: DeployWeb
@@ -109,9 +88,16 @@ stages:
     pool:
       name: Azure-UIP
     # creates an environment if it doesn't exist
-    environment: 'smarthotel-dev'
+    environment: 'production'
     strategy:
       runOnce:
         deploy:
           steps:
           - script: echo Hello world
+          - download: current
+            artifact: drop
+          - task: UiPathDeploy@3
+            inputs:
+             orchestratorConnection: 'zohan-lab'
+             packagesPath: '$(Pipeline.Workspace)\drop'
+             folderName: Shared
