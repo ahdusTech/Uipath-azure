@@ -83,12 +83,14 @@ stages:
 
 - stage: deploy_Server
   jobs:
-  - deployment: DeployWeb
+  - deployment: DeployPRD
     displayName: deploy Web App
+    dependsOn: TstDeploy
+    condition: succeeded()
     pool:
       name: Azure-UIP
     # creates an environment if it doesn't exist
-    environment: 'production'
+    environment: 'Production_Server'
     strategy:
       runOnce:
         deploy:
