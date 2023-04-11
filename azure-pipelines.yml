@@ -13,6 +13,8 @@ stages:
   jobs:
   - job: BuildPackage
     pool: Azure-UIP
+ workspace:
+    clean: all
     steps:
     - task: UiPathPack@3
       inputs:
@@ -81,12 +83,11 @@ stages:
   - job: DeployToTestJob
     pool:
       name: Azure-UIP
+   
       environment: PRD_approval_required
       strategy:    
-          runOnce:
-            deploy:
-      workspace:
-      clean: all
+      runOnce:
+      deploy:
      
     steps:
     - download: current
