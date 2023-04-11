@@ -102,7 +102,7 @@ stages:
         orchestratorConnection: 'zohan-lab'
         packagesPath: '$(Pipeline.Workspace)\drop'
         folderName: Shared
-- stage: deploy-Server
+- stage: deploy_Server
   jobs:
   - deployment: DeployWeb
     displayName: deploy Web App
