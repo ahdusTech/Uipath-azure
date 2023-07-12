@@ -1,0 +1,24 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main  # or the name of your default branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Deploy to VPS
+      run: |
+        mkdir -p ~/.ssh/
+        echo "${{ secrets.DEPLOY_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan 20.233.8.51 >> ~/.ssh/known_hosts
+        rsync -aP --delete . root@20.233.8.51:/var/www/html/test
+        ssh user@your_server_ip "cd /var/www/html/test/ && npm install && pm2 restart app"
+      shell: bash
