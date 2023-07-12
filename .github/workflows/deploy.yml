@@ -20,5 +20,5 @@ jobs:
         chmod 600 ~/.ssh/id_rsa
         ssh-keyscan 20.233.8.51 >> ~/.ssh/known_hosts
         rsync -aP --delete . root@20.233.8.51:/var/www/html/test
-        ssh user@your_server_ip "cd /var/www/html/test/ && npm install && pm2 restart app"
+        ssh user@your_server_ip "cd /var/www/html/test/ && npm install --f && pm2 restart app"
       shell: bash
